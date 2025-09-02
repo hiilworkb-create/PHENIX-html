@@ -24,37 +24,31 @@
       text-align: center;
     }
 
+    .logo {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
     h2 {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       font-size: 22px;
       color: #222;
     }
 
-    .input-group {
-      position: relative;
-      margin-bottom: 8px;
-    }
-
-    .input-group span {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      color: #555;
-      pointer-events: none;
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
     }
 
     .form-input {
       width: 100%;
-      height: 50px;
-      padding: 10px 14px 10px 40px; /* отступ для иконки */
+      height: 45px;
+      padding: 10px;
       font-size: 16px;
       border: 2px solid #ccc;
       border-radius: 10px;
-      outline: none;
-      transition: all 0.3s ease;
       box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
     .form-input:focus {
@@ -75,20 +69,16 @@
     .example {
       font-size: 13px;
       color: #666;
-      margin-bottom: 16px;
-      text-align: left;
+      margin-top: 5px;
     }
 
     .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
       margin-top: 20px;
     }
 
     .btn {
-      flex: 1;
-      height: 50px;
+      width: 100%;
+      height: 45px;
       border: none;
       border-radius: 10px;
       font-size: 16px;
@@ -97,70 +87,54 @@
       transition: background 0.3s ease, transform 0.05s;
     }
 
-    .btn:active {
-      transform: translateY(1px);
-    }
-
     .btn-primary {
       background: #007bff;
       color: #fff;
     }
+
     .btn-primary:disabled {
       background: #b0c4de;
       cursor: not-allowed;
     }
 
-    .btn-secondary {
-      background: #6c757d;
-      color: #fff;
-    }
-    .btn-secondary:hover {
-      background: #545b62;
-    }
-
-    .error {
-      color: red;
-      font-size: 13px;
-      margin-bottom: 10px;
+    .checkbox {
+      margin: 15px 0;
       text-align: left;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>📝 Введите данные</h2>
+    <div class="logo">🦅</div>
+    <h2>Phenix Bot</h2>
 
     <form id="dataForm">
-      <div class="input-group">
-        <span>🧑</span>
+      <div class="form-group">
         <input type="text" class="form-input" id="fio" placeholder="ФИО" required>
+        <div class="example">Пример: Иванов Иван Иванович</div>
       </div>
-      <div class="example">Пример: Иванов Иван Иванович</div>
-      <div id="fioError" class="error"></div>
 
-      <div class="input-group">
-        <span>📘</span>
-        <input type="text" class="form-input" id="passport" placeholder="Паспорт" required maxlength="11">
+      <div class="form-group">
+        <input type="text" class="form-input" id="phone" placeholder="Телефон" required>
+        <div class="example">Пример: +7 (999) 123-45-67</div>
       </div>
-      <div class="example">Пример: 1234 567890</div>
-      <div id="passportError" class="error"></div>
 
-      <div class="input-group">
-        <span>🧾</span>
-        <input type="text" class="form-input" id="snils" placeholder="СНИЛС" required maxlength="14">
+      <div class="form-group">
+        <label><input type="radio" name="docType" value="passport"> 📘 Паспорт</label><br>
+        <label><input type="radio" name="docType" value="snils"> 🧾 СНИЛС</label><br>
+        <label><input type="radio" name="docType" value="inn"> 💳 ИНН</label>
       </div>
-      <div class="example">Пример: 112-233-445 95</div>
-      <div id="snilsError" class="error"></div>
 
-      <div class="input-group">
-        <span>💳</span>
-        <input type="text" class="form-input" id="inn" placeholder="ИНН" required maxlength="12">
+      <div class="form-group" id="docField" style="display:none;">
+        <input type="text" class="form-input" id="document" placeholder="">
+        <div class="example" id="docExample"></div>
       </div>
-      <div class="example">Пример: 123456789012</div>
-      <div id="innError" class="error"></div>
+
+      <div class="checkbox">
+        <label><input type="checkbox" id="notRobot"> Я не робот</label>
+      </div>
 
       <div class="actions">
-        <button type="button" class="btn btn-secondary">⬅ Назад</button>
         <button type="submit" id="nextBtn" class="btn btn-primary" disabled>➡ Далее</button>
       </div>
     </form>
@@ -168,10 +142,15 @@
 
   <script>
     const fioField = document.getElementById("fio");
-    const passportField = document.getElementById("passport");
-    const snilsField = document.getElementById("snils");
-    const innField = document.getElementById("inn");
+    const phoneField = document.getElementById("phone");
+    const docRadios = document.querySelectorAll("input[name='docType']");
+    const docField = document.getElementById("docField");
+    const documentInput = document.getElementById("document");
+    const docExample = document.getElementById("docExample");
+    const notRobot = document.getElementById("notRobot");
     const nextBtn = document.getElementById("nextBtn");
+
+    let selectedDoc = "";
 
     function setValidationStyle(field, isValid) {
       field.classList.remove("valid", "invalid");
@@ -182,76 +161,88 @@
     function validateForm() {
       let valid = true;
 
-      // ФИО
+      // ФИО: только русские буквы
       const fio = fioField.value.trim();
       if (!/^[А-Яа-яЁё\s]+$/.test(fio)) {
-        document.getElementById("fioError").innerText = "Введите ФИО только русскими буквами.";
         setValidationStyle(fioField, false);
         valid = false;
       } else {
-        document.getElementById("fioError").innerText = "";
         setValidationStyle(fioField, true);
       }
 
-      // Паспорт
-      const passport = passportField.value.trim();
-      if (!/^\d{4}\s\d{6}$/.test(passport)) {
-        document.getElementById("passportError").innerText = "Формат: 1234 567890";
-        setValidationStyle(passportField, false);
+      // Телефон: +7 (XXX) XXX-XX-XX
+      const phone = phoneField.value.trim();
+      if (!/^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/.test(phone)) {
+        setValidationStyle(phoneField, false);
         valid = false;
       } else {
-        document.getElementById("passportError").innerText = "";
-        setValidationStyle(passportField, true);
+        setValidationStyle(phoneField, true);
       }
 
-      // СНИЛС
-      const snils = snilsField.value.trim();
-      if (!/^\d{3}-\d{3}-\d{3}\s\d{2}$/.test(snils)) {
-        document.getElementById("snilsError").innerText = "Формат: 123-456-789 00";
-        setValidationStyle(snilsField, false);
-        valid = false;
-      } else {
-        document.getElementById("snilsError").innerText = "";
-        setValidationStyle(snilsField, true);
-      }
+      // Документ
+      if (selectedDoc) {
+        const docVal = documentInput.value.trim();
+        let regex;
+        if (selectedDoc === "passport") regex = /^\d{4}\s\d{6}$/;
+        if (selectedDoc === "snils") regex = /^\d{3}-\d{3}-\d{3}\s\d{2}$/;
+        if (selectedDoc === "inn") regex = /^\d{12}$/;
 
-      // ИНН
-      const inn = innField.value.trim();
-      if (!/^\d{12}$/.test(inn)) {
-        document.getElementById("innError").innerText = "ИНН должен содержать 12 цифр.";
-        setValidationStyle(innField, false);
-        valid = false;
-      } else {
-        document.getElementById("innError").innerText = "";
-        setValidationStyle(innField, true);
-      }
+        if (!regex.test(docVal)) {
+          setValidationStyle(documentInput, false);
+          valid = false;
+        } else {
+          setValidationStyle(documentInput, true);
+        }
+      } else valid = false;
+
+      // Чекбокс "я не робот"
+      if (!notRobot.checked) valid = false;
 
       nextBtn.disabled = !valid;
     }
 
-    // Маски
-    passportField.addEventListener("input", e => {
+    // Маска для телефона
+    phoneField.addEventListener("input", e => {
       let v = e.target.value.replace(/\D/g, "");
-      if (v.length > 4) v = v.slice(0,4) + " " + v.slice(4,10);
-      e.target.value = v;
+      if (v.startsWith("7")) v = v.substring(1);
+      if (v.length > 10) v = v.substring(0,10);
+      let formatted = "+7";
+      if (v.length > 0) formatted += " (" + v.substring(0,3);
+      if (v.length >= 3) formatted += ") " + v.substring(3,6);
+      if (v.length >= 6) formatted += "-" + v.substring(6,8);
+      if (v.length >= 8) formatted += "-" + v.substring(8,10);
+      e.target.value = formatted;
       validateForm();
     });
 
-    snilsField.addEventListener("input", e => {
-      let v = e.target.value.replace(/\D/g, "");
-      if (v.length > 3) v = v.slice(0,3) + "-" + v.slice(3);
-      if (v.length > 7) v = v.slice(0,7) + "-" + v.slice(7);
-      if (v.length > 11) v = v.slice(0,11) + " " + v.slice(11,13);
-      e.target.value = v;
-      validateForm();
-    });
+    // Радио кнопки
+    docRadios.forEach(r => {
+      r.addEventListener("change", () => {
+        selectedDoc = r.value;
+        docField.style.display = "block";
+        documentInput.value = "";
+        documentInput.classList.remove("valid","invalid");
 
-    innField.addEventListener("input", e => {
-      e.target.value = e.target.value.replace(/\D/g, "").slice(0,12);
-      validateForm();
+        if (selectedDoc === "passport") {
+          documentInput.placeholder = "Паспорт";
+          docExample.innerText = "Пример: 1234 567890";
+        }
+        if (selectedDoc === "snils") {
+          documentInput.placeholder = "СНИЛС";
+          docExample.innerText = "Пример: 112-233-445 95";
+        }
+        if (selectedDoc === "inn") {
+          documentInput.placeholder = "ИНН";
+          docExample.innerText = "Пример: 123456789012";
+        }
+
+        validateForm();
+      });
     });
 
     fioField.addEventListener("input", validateForm);
+    documentInput.addEventListener("input", validateForm);
+    notRobot.addEventListener("change", validateForm);
 
     document.getElementById("dataForm").addEventListener("submit", e => {
       e.preventDefault();
