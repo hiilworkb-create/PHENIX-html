@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Phenix Bot</title>
+  <title>ФЕНИКС Бот</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,7 +10,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
     }
     .container {
@@ -23,8 +23,19 @@
       text-align: center;
     }
     h2 {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-size: 22px;
+      font-weight: bold;
+      color: #222;
+    }
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
       color: #333;
     }
     .form-input {
@@ -34,171 +45,106 @@
       font-size: 16px;
       border: 2px solid #ccc;
       border-radius: 8px;
-      margin-bottom: 10px;
+      outline: none;
       transition: 0.3s;
     }
     .form-input:focus {
       border-color: #007bff;
-      box-shadow: 0 0 6px rgba(0,123,255,0.4);
-    }
-    .form-input.valid {
-      border-color: #28a745;
-    }
-    .form-input.invalid {
-      border-color: #dc3545;
+      box-shadow: 0 0 6px rgba(0,123,255,0.3);
     }
     .example {
       font-size: 13px;
       color: #777;
-      margin-bottom: 10px;
-      text-align: left;
+      margin-top: 3px;
     }
     .radio-group {
-      margin: 15px 0;
       text-align: left;
+      margin-bottom: 15px;
+    }
+    .radio-option {
+      margin: 8px 0;
     }
     .btn {
+      display: inline-block;
       padding: 10px 20px;
       font-size: 15px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
       margin: 5px;
+      transition: 0.3s;
     }
     .btn-primary {
       background: #007bff;
       color: #fff;
     }
-    .btn-primary:hover {
-      background: #0056b3;
-    }
+    .btn-primary:hover { background: #0056b3; }
     .btn-secondary {
       background: #6c757d;
       color: #fff;
     }
-    .btn-secondary:hover {
-      background: #545b62;
-    }
-    .checkbox {
-      margin: 15px 0;
-      text-align: left;
+    .btn-secondary:hover { background: #545b62; }
+    .captcha {
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>📝 Введите данные</h2>
+    <h2>🔥 Добро пожаловать в ФЕНИКС!</h2>
 
     <!-- ФИО -->
-    <input type="text" id="fio" class="form-input" placeholder="ФИО">
-    <div class="example">Пример: Иванов Иван Иванович</div>
+    <div class="form-group">
+      <label>👤 ФИО</label>
+      <input type="text" class="form-input" placeholder="Иванов Иван Иванович" required pattern="^[А-Яа-яЁё\s]+$">
+      <div class="example">Пример: Иванов Иван Иванович</div>
+    </div>
 
     <!-- Телефон -->
-    <input type="text" id="phone" class="form-input" placeholder="Телефон">
-    <div class="example">Пример: +79998887766</div>
+    <div class="form-group">
+      <label>📞 Номер телефона</label>
+      <input type="tel" class="form-input" placeholder="+7 999 123 45 67" required pattern="^\+7\s?\d{3}\s?\d{3}\s?\d{2}\s?\d{2}$">
+      <div class="example">Пример: +7 999 123 45 67</div>
+    </div>
 
     <!-- Выбор документа -->
     <div class="radio-group">
-      <label><input type="radio" name="docType" value="passport"> Паспорт</label><br>
-      <label><input type="radio" name="docType" value="snils"> СНИЛС</label><br>
-      <label><input type="radio" name="docType" value="inn"> ИНН</label>
+      <label>📑 Выберите документ</label>
+      <div class="radio-option">
+        <input type="radio" name="doc" id="passport">
+        <label for="passport">Паспорт</label>
+        <input type="text" class="form-input" placeholder="1234 567890" pattern="^\d{4}\s\d{6}$">
+      </div>
+      <div class="radio-option">
+        <input type="radio" name="doc" id="snils">
+        <label for="snils">СНИЛС</label>
+        <input type="text" class="form-input" placeholder="112-233-445 95" pattern="^\d{3}-\d{3}-\d{3}\s\d{2}$">
+      </div>
+      <div class="radio-option">
+        <input type="radio" name="doc" id="inn">
+        <label for="inn">ИНН</label>
+        <input type="text" class="form-input" placeholder="123456789012" pattern="^\d{12}$">
+      </div>
     </div>
 
-    <!-- Поле документа -->
-    <input type="text" id="docInput" class="form-input" placeholder="Введите данные документа">
-    <div class="example" id="docExample">Пример: выберите тип документа</div>
-
-    <!-- Чекбокс "Я не робот" -->
-    <div class="checkbox">
-      <label><input type="checkbox" id="notRobot"> Я не робот</label>
-    </div>
-
+    <!-- Кнопки -->
     <div>
       <button class="btn btn-secondary">⬅ Назад</button>
-      <button class="btn btn-primary" onclick="validateForm()">➡ Далее</button>
+      <button class="btn btn-primary">➡ Далее</button>
+    </div>
+
+    <!-- Капча -->
+    <div class="captcha">
+      <input type="checkbox" id="captcha">
+      <label for="captcha">Я не робот</label>
     </div>
   </div>
-
-  <script>
-    const fio = document.getElementById("fio");
-    const phone = document.getElementById("phone");
-    const docInput = document.getElementById("docInput");
-    const docExample = document.getElementById("docExample");
-
-    document.querySelectorAll('input[name="docType"]').forEach(radio => {
-      radio.addEventListener("change", () => {
-        docInput.value = "";
-        docInput.classList.remove("valid", "invalid");
-        if (radio.value === "passport") {
-          docExample.textContent = "Пример: 1234 567890";
-        } else if (radio.value === "snils") {
-          docExample.textContent = "Пример: 112-233-445 95";
-        } else if (radio.value === "inn") {
-          docExample.textContent = "Пример: 123456789012";
-        }
-      });
-    });
-
-    function validateForm() {
-      let valid = true;
-
-      // ФИО
-      const fioRegex = /^[А-Яа-яЁё]+\s[А-Яа-яЁё]+\s[А-Яа-яЁё]+$/;
-      if (fioRegex.test(fio.value.trim())) {
-        fio.classList.add("valid");
-        fio.classList.remove("invalid");
-      } else {
-        fio.classList.add("invalid");
-        fio.classList.remove("valid");
-        valid = false;
-      }
-
-      // Телефон
-      const phoneRegex = /^\+7\d{10}$/;
-      if (phoneRegex.test(phone.value.trim())) {
-        phone.classList.add("valid");
-        phone.classList.remove("invalid");
-      } else {
-        phone.classList.add("invalid");
-        phone.classList.remove("valid");
-        valid = false;
-      }
-
-      // Документ
-      const selected = document.querySelector('input[name="docType"]:checked');
-      if (selected) {
-        if (selected.value === "passport" && /^\d{4}\s\d{6}$/.test(docInput.value.trim())) {
-          docInput.classList.add("valid");
-          docInput.classList.remove("invalid");
-        } else if (selected.value === "snils" && /^\d{3}-\d{3}-\d{3}\s\d{2}$/.test(docInput.value.trim())) {
-          docInput.classList.add("valid");
-          docInput.classList.remove("invalid");
-        } else if (selected.value === "inn" && /^\d{12}$/.test(docInput.value.trim())) {
-          docInput.classList.add("valid");
-          docInput.classList.remove("invalid");
-        } else {
-          docInput.classList.add("invalid");
-          docInput.classList.remove("valid");
-          valid = false;
-        }
-      } else {
-        valid = false;
-        docInput.classList.add("invalid");
-      }
-
-      // Я не робот
-      const notRobot = document.getElementById("notRobot");
-      if (!notRobot.checked) {
-        alert("Подтвердите, что вы не робот");
-        valid = false;
-      }
-
-      if (valid) {
-        alert("✅ Данные введены корректно!");
-      } else {
-        alert("❌ Проверьте правильность введённых данных.");
-      }
-    }
-  </script>
 </body>
 </html>
