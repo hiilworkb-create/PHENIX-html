@@ -18,54 +18,96 @@
       background: #fff;
       padding: 25px;
       border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
     }
 
     h2 {
-      margin-bottom: 20px;
-      font-size: 20px;
-      color: #333;
+      margin-bottom: 25px;
+      font-size: 22px;
+      color: #222;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .input-group span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #555;
+      pointer-events: none;
     }
 
     .form-input {
       width: 100%;
-      max-width: 320px;
-      height: 45px;
-      padding: 10px 12px;
+      height: 50px;
+      padding: 10px 14px 10px 40px; /* отступ для иконки */
       font-size: 16px;
       border: 2px solid #ccc;
       border-radius: 10px;
       outline: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
       transition: all 0.3s ease;
+      box-sizing: border-box;
     }
 
     .form-input:focus {
       border-color: #007bff;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+      box-shadow: 0 0 6px rgba(0,123,255,0.3);
+    }
+
+    .valid {
+      border-color: #28a745 !important;
+      box-shadow: 0 0 6px rgba(40,167,69,0.5) !important;
+    }
+
+    .invalid {
+      border-color: #dc3545 !important;
+      box-shadow: 0 0 6px rgba(220,53,69,0.5) !important;
+    }
+
+    .example {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      font-size: 15px;
-      border-radius: 8px;
+      flex: 1;
+      height: 50px;
       border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      margin: 5px;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.05s;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
     }
 
     .btn-primary {
       background: #007bff;
       color: #fff;
     }
-    .btn-primary:hover {
-      background: #0056b3;
+    .btn-primary:disabled {
+      background: #b0c4de;
+      cursor: not-allowed;
     }
 
     .btn-secondary {
@@ -76,10 +118,11 @@
       background: #545b62;
     }
 
-    .example {
+    .error {
+      color: red;
       font-size: 13px;
-      color: #777;
       margin-bottom: 10px;
+      text-align: left;
     }
   </style>
 </head>
@@ -87,22 +130,133 @@
   <div class="container">
     <h2>📝 Введите данные</h2>
 
-    <input type="text" class="form-input" placeholder="ФИО">
-    <div class="example">Пример: Иванов Иван Иванович</div>
+    <form id="dataForm">
+      <div class="input-group">
+        <span>🧑</span>
+        <input type="text" class="form-input" id="fio" placeholder="ФИО" required>
+      </div>
+      <div class="example">Пример: Иванов Иван Иванович</div>
+      <div id="fioError" class="error"></div>
 
-    <input type="text" class="form-input" placeholder="Паспорт">
-    <div class="example">Пример: 1234 567890</div>
+      <div class="input-group">
+        <span>📘</span>
+        <input type="text" class="form-input" id="passport" placeholder="Паспорт" required maxlength="11">
+      </div>
+      <div class="example">Пример: 1234 567890</div>
+      <div id="passportError" class="error"></div>
 
-    <input type="text" class="form-input" placeholder="СНИЛС">
-    <div class="example">Пример: 112-233-445 95</div>
+      <div class="input-group">
+        <span>🧾</span>
+        <input type="text" class="form-input" id="snils" placeholder="СНИЛС" required maxlength="14">
+      </div>
+      <div class="example">Пример: 112-233-445 95</div>
+      <div id="snilsError" class="error"></div>
 
-    <input type="text" class="form-input" placeholder="ИНН">
-    <div class="example">Пример: 123456789012</div>
+      <div class="input-group">
+        <span>💳</span>
+        <input type="text" class="form-input" id="inn" placeholder="ИНН" required maxlength="12">
+      </div>
+      <div class="example">Пример: 123456789012</div>
+      <div id="innError" class="error"></div>
 
-    <div>
-      <button class="btn btn-secondary">⬅ Назад</button>
-      <button class="btn btn-primary">➡ Далее</button>
-    </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary">⬅ Назад</button>
+        <button type="submit" id="nextBtn" class="btn btn-primary" disabled>➡ Далее</button>
+      </div>
+    </form>
   </div>
+
+  <script>
+    const fioField = document.getElementById("fio");
+    const passportField = document.getElementById("passport");
+    const snilsField = document.getElementById("snils");
+    const innField = document.getElementById("inn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function setValidationStyle(field, isValid) {
+      field.classList.remove("valid", "invalid");
+      if (isValid) field.classList.add("valid");
+      else field.classList.add("invalid");
+    }
+
+    function validateForm() {
+      let valid = true;
+
+      // ФИО
+      const fio = fioField.value.trim();
+      if (!/^[А-Яа-яЁё\s]+$/.test(fio)) {
+        document.getElementById("fioError").innerText = "Введите ФИО только русскими буквами.";
+        setValidationStyle(fioField, false);
+        valid = false;
+      } else {
+        document.getElementById("fioError").innerText = "";
+        setValidationStyle(fioField, true);
+      }
+
+      // Паспорт
+      const passport = passportField.value.trim();
+      if (!/^\d{4}\s\d{6}$/.test(passport)) {
+        document.getElementById("passportError").innerText = "Формат: 1234 567890";
+        setValidationStyle(passportField, false);
+        valid = false;
+      } else {
+        document.getElementById("passportError").innerText = "";
+        setValidationStyle(passportField, true);
+      }
+
+      // СНИЛС
+      const snils = snilsField.value.trim();
+      if (!/^\d{3}-\d{3}-\d{3}\s\d{2}$/.test(snils)) {
+        document.getElementById("snilsError").innerText = "Формат: 123-456-789 00";
+        setValidationStyle(snilsField, false);
+        valid = false;
+      } else {
+        document.getElementById("snilsError").innerText = "";
+        setValidationStyle(snilsField, true);
+      }
+
+      // ИНН
+      const inn = innField.value.trim();
+      if (!/^\d{12}$/.test(inn)) {
+        document.getElementById("innError").innerText = "ИНН должен содержать 12 цифр.";
+        setValidationStyle(innField, false);
+        valid = false;
+      } else {
+        document.getElementById("innError").innerText = "";
+        setValidationStyle(innField, true);
+      }
+
+      nextBtn.disabled = !valid;
+    }
+
+    // Маски
+    passportField.addEventListener("input", e => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 4) v = v.slice(0,4) + " " + v.slice(4,10);
+      e.target.value = v;
+      validateForm();
+    });
+
+    snilsField.addEventListener("input", e => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 3) v = v.slice(0,3) + "-" + v.slice(3);
+      if (v.length > 7) v = v.slice(0,7) + "-" + v.slice(7);
+      if (v.length > 11) v = v.slice(0,11) + " " + v.slice(11,13);
+      e.target.value = v;
+      validateForm();
+    });
+
+    innField.addEventListener("input", e => {
+      e.target.value = e.target.value.replace(/\D/g, "").slice(0,12);
+      validateForm();
+    });
+
+    fioField.addEventListener("input", validateForm);
+
+    document.getElementById("dataForm").addEventListener("submit", e => {
+      e.preventDefault();
+      if (!nextBtn.disabled) alert("✅ Данные успешно введены!");
+    });
+  </script>
 </body>
 </html>
