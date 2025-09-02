@@ -57,26 +57,19 @@
       margin: 8px;
       transition: background 0.3s ease;
     }
-    .btn-primary {
-      background: #007bff;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #0056b3;
-    }
-    .btn-secondary {
-      background: #6c757d;
-      color: #fff;
-    }
-    .btn-secondary:hover {
-      background: #545b62;
-    }
+    .btn-primary { background: #007bff; color: #fff; }
+    .btn-primary:hover { background: #0056b3; }
+    .btn-secondary { background: #6c757d; color: #fff; }
+    .btn-secondary:hover { background: #545b62; }
 
     .hidden { display: none; }
 
-    .checkbox {
-      margin: 20px 0;
-      font-size: 15px;
+    .checkbox { margin: 20px 0; font-size: 15px; }
+
+    .example {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -102,33 +95,29 @@
     <!-- Шаг 3 -->
     <div id="step3" class="hidden">
       <h2>📄 Выберите документ</h2>
-      <label><input type="radio" name="doc" value="passport"> Паспорт</label><br>
-      <label><input type="radio" name="doc" value="snils"> СНИЛС</label><br>
-      <label><input type="radio" name="doc" value="inn"> ИНН</label>
+      <label><input type="radio" name="doc" value="passport" onchange="showDocForm()"> Паспорт</label><br>
+      <label><input type="radio" name="doc" value="snils" onchange="showDocForm()"> СНИЛС</label><br>
+      <label><input type="radio" name="doc" value="inn" onchange="showDocForm()"> ИНН</label>
+
+      <div id="docForm" class="hidden">
+        <input type="text" id="docNumber" class="form-input" placeholder="Введите номер документа">
+        <div id="docExample" class="example"></div>
+      </div>
+
       <div>
         <button class="btn btn-secondary" onclick="prevStep(2)">⬅ Назад</button>
-        <button class="btn btn-primary" onclick="validateDoc()">➡ Продолжить</button>
+        <button class="btn btn-primary" onclick="validateDocNumber()">➡ Продолжить</button>
       </div>
     </div>
 
     <!-- Шаг 4 -->
     <div id="step4" class="hidden">
-      <h2>✍ Введите номер документа</h2>
-      <input type="text" id="docNumber" class="form-input" placeholder="Введите номер">
-      <div>
-        <button class="btn btn-secondary" onclick="prevStep(3)">⬅ Назад</button>
-        <button class="btn btn-primary" onclick="validateDocNumber()">➡ Продолжить</button>
-      </div>
-    </div>
-
-    <!-- Шаг 5 -->
-    <div id="step5" class="hidden">
       <h2>✅ Завершение</h2>
       <div class="checkbox">
         <label><input type="checkbox" id="robot"> Я не робот</label>
       </div>
       <div>
-        <button class="btn btn-secondary" onclick="prevStep(4)">⬅ Назад</button>
+        <button class="btn btn-secondary" onclick="prevStep(3)">⬅ Назад</button>
         <button class="btn btn-primary" onclick="finish()">➡ Отправить</button>
       </div>
     </div>
@@ -140,9 +129,7 @@
       document.getElementById('step' + step).classList.remove('hidden');
     }
 
-    function prevStep(step) {
-      nextStep(step);
-    }
+    function prevStep(step) { nextStep(step); }
 
     function validateFio() {
       const fio = document.getElementById("fio").value.trim();
@@ -162,26 +149,37 @@
       }
     }
 
-    function validateDoc() {
-      const doc = document.querySelector('input[name="doc"]:checked');
-      if (doc) {
-        nextStep(4);
-      } else {
-        alert("Выберите документ (паспорт, СНИЛС или ИНН).");
+    function showDocForm() {
+      const doc = document.querySelector('input[name="doc"]:checked').value;
+      const form = document.getElementById("docForm");
+      const example = document.getElementById("docExample");
+      form.classList.remove("hidden");
+
+      if (doc === "passport") {
+        example.innerText = "Пример паспорта: 1234 567890";
+      } else if (doc === "snils") {
+        example.innerText = "Пример СНИЛС: 112-233-445 95";
+      } else if (doc === "inn") {
+        example.innerText = "Пример ИНН: 123456789012";
       }
     }
 
     function validateDocNumber() {
-      const doc = document.querySelector('input[name="doc"]:checked').value;
+      const doc = document.querySelector('input[name="doc"]:checked');
       const number = document.getElementById("docNumber").value.trim();
 
+      if (!doc) {
+        alert("Выберите документ.");
+        return;
+      }
+
       let valid = false;
-      if (doc === "passport" && /^\d{4}\s?\d{6}$/.test(number)) valid = true;
-      if (doc === "snils" && /^\d{3}-\d{3}-\d{3}\s?\d{2}$/.test(number)) valid = true;
-      if (doc === "inn" && /^\d{12}$/.test(number)) valid = true;
+      if (doc.value === "passport" && /^\d{4}\s?\d{6}$/.test(number)) valid = true;
+      if (doc.value === "snils" && /^\d{3}-\d{3}-\d{3}\s?\d{2}$/.test(number)) valid = true;
+      if (doc.value === "inn" && /^\d{12}$/.test(number)) valid = true;
 
       if (valid) {
-        nextStep(5);
+        nextStep(4);
       } else {
         alert("Введите корректный номер документа.");
       }
