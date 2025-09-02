@@ -13,7 +13,6 @@
       height: 100vh;
       margin: 0;
     }
-
     .container {
       background: #fff;
       padding: 25px;
@@ -23,80 +22,63 @@
       max-width: 420px;
       text-align: center;
     }
-
-    .logo {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-
     h2 {
       margin-bottom: 20px;
       font-size: 22px;
-      color: #222;
+      color: #333;
     }
-
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-
-    .form-input, select {
+    .form-input {
       width: 100%;
       height: 45px;
       padding: 10px;
       font-size: 16px;
       border: 2px solid #ccc;
-      border-radius: 10px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: 0.3s;
     }
-
-    .form-input:focus, select:focus {
+    .form-input:focus {
       border-color: #007bff;
-      box-shadow: 0 0 6px rgba(0,123,255,0.3);
+      box-shadow: 0 0 6px rgba(0,123,255,0.4);
     }
-
-    .valid {
-      border-color: #28a745 !important;
-      box-shadow: 0 0 6px rgba(40,167,69,0.5) !important;
+    .form-input.valid {
+      border-color: #28a745;
     }
-
-    .invalid {
-      border-color: #dc3545 !important;
-      box-shadow: 0 0 6px rgba(220,53,69,0.5) !important;
+    .form-input.invalid {
+      border-color: #dc3545;
     }
-
     .example {
       font-size: 13px;
-      color: #666;
-      margin-top: 5px;
+      color: #777;
+      margin-bottom: 10px;
+      text-align: left;
     }
-
-    .actions {
-      margin-top: 20px;
+    .radio-group {
+      margin: 15px 0;
+      text-align: left;
     }
-
     .btn {
-      width: 100%;
-      height: 45px;
+      padding: 10px 20px;
+      font-size: 15px;
+      border-radius: 8px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s ease;
+      margin: 5px;
     }
-
     .btn-primary {
       background: #007bff;
       color: #fff;
     }
-
-    .btn-primary:disabled {
-      background: #b0c4de;
-      cursor: not-allowed;
+    .btn-primary:hover {
+      background: #0056b3;
     }
-
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background: #545b62;
+    }
     .checkbox {
       margin: 15px 0;
       text-align: left;
@@ -105,150 +87,118 @@
 </head>
 <body>
   <div class="container">
-    <div class="logo">🦅</div>
-    <h2>Phenix Bot</h2>
+    <h2>📝 Введите данные</h2>
 
-    <form id="dataForm">
-      <div class="form-group">
-        <input type="text" class="form-input" id="fio" placeholder="ФИО" required>
-        <div class="example">Пример: Иванов Иван Иванович</div>
-      </div>
+    <!-- ФИО -->
+    <input type="text" id="fio" class="form-input" placeholder="ФИО">
+    <div class="example">Пример: Иванов Иван Иванович</div>
 
-      <div class="form-group">
-        <input type="text" class="form-input" id="phone" placeholder="Телефон" required>
-        <div class="example">Пример: +7 (999) 123-45-67</div>
-      </div>
+    <!-- Телефон -->
+    <input type="text" id="phone" class="form-input" placeholder="Телефон">
+    <div class="example">Пример: +79998887766</div>
 
-      <div class="form-group">
-        <select id="docType" class="form-input" required>
-          <option value="">Выберите документ</option>
-          <option value="passport">📘 Паспорт</option>
-          <option value="snils">🧾 СНИЛС</option>
-          <option value="inn">💳 ИНН</option>
-        </select>
-      </div>
+    <!-- Выбор документа -->
+    <div class="radio-group">
+      <label><input type="radio" name="docType" value="passport"> Паспорт</label><br>
+      <label><input type="radio" name="docType" value="snils"> СНИЛС</label><br>
+      <label><input type="radio" name="docType" value="inn"> ИНН</label>
+    </div>
 
-      <div class="form-group" id="docField" style="display:none;">
-        <input type="text" class="form-input" id="document" placeholder="">
-        <div class="example" id="docExample"></div>
-      </div>
+    <!-- Поле документа -->
+    <input type="text" id="docInput" class="form-input" placeholder="Введите данные документа">
+    <div class="example" id="docExample">Пример: выберите тип документа</div>
 
-      <div class="checkbox">
-        <label><input type="checkbox" id="notRobot"> Я не робот</label>
-      </div>
+    <!-- Чекбокс "Я не робот" -->
+    <div class="checkbox">
+      <label><input type="checkbox" id="notRobot"> Я не робот</label>
+    </div>
 
-      <div class="actions">
-        <button type="submit" id="nextBtn" class="btn btn-primary" disabled>➡ Далее</button>
-      </div>
-    </form>
+    <div>
+      <button class="btn btn-secondary">⬅ Назад</button>
+      <button class="btn btn-primary" onclick="validateForm()">➡ Далее</button>
+    </div>
   </div>
 
   <script>
-    const fioField = document.getElementById("fio");
-    const phoneField = document.getElementById("phone");
-    const docType = document.getElementById("docType");
-    const docField = document.getElementById("docField");
-    const documentInput = document.getElementById("document");
+    const fio = document.getElementById("fio");
+    const phone = document.getElementById("phone");
+    const docInput = document.getElementById("docInput");
     const docExample = document.getElementById("docExample");
-    const notRobot = document.getElementById("notRobot");
-    const nextBtn = document.getElementById("nextBtn");
 
-    let selectedDoc = "";
-
-    function setValidationStyle(field, isValid) {
-      field.classList.remove("valid", "invalid");
-      if (isValid) field.classList.add("valid");
-      else if (field.value.trim() !== "") field.classList.add("invalid");
-    }
+    document.querySelectorAll('input[name="docType"]').forEach(radio => {
+      radio.addEventListener("change", () => {
+        docInput.value = "";
+        docInput.classList.remove("valid", "invalid");
+        if (radio.value === "passport") {
+          docExample.textContent = "Пример: 1234 567890";
+        } else if (radio.value === "snils") {
+          docExample.textContent = "Пример: 112-233-445 95";
+        } else if (radio.value === "inn") {
+          docExample.textContent = "Пример: 123456789012";
+        }
+      });
+    });
 
     function validateForm() {
       let valid = true;
 
-      // ФИО: только буквы
-      const fio = fioField.value.trim();
-      if (!/^[А-Яа-яЁё\s]+$/.test(fio)) {
-        setValidationStyle(fioField, false);
-        valid = false;
+      // ФИО
+      const fioRegex = /^[А-Яа-яЁё]+\s[А-Яа-яЁё]+\s[А-Яа-яЁё]+$/;
+      if (fioRegex.test(fio.value.trim())) {
+        fio.classList.add("valid");
+        fio.classList.remove("invalid");
       } else {
-        setValidationStyle(fioField, true);
+        fio.classList.add("invalid");
+        fio.classList.remove("valid");
+        valid = false;
       }
 
-      // Телефон: +7 (XXX) XXX-XX-XX
-      const phone = phoneField.value.trim();
-      if (!/^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/.test(phone)) {
-        setValidationStyle(phoneField, false);
-        valid = false;
+      // Телефон
+      const phoneRegex = /^\+7\d{10}$/;
+      if (phoneRegex.test(phone.value.trim())) {
+        phone.classList.add("valid");
+        phone.classList.remove("invalid");
       } else {
-        setValidationStyle(phoneField, true);
+        phone.classList.add("invalid");
+        phone.classList.remove("valid");
+        valid = false;
       }
 
       // Документ
-      if (selectedDoc) {
-        const docVal = documentInput.value.trim();
-        let regex;
-        if (selectedDoc === "passport") regex = /^\d{4}\s\d{6}$/;
-        if (selectedDoc === "snils") regex = /^\d{3}-\d{3}-\d{3}\s\d{2}$/;
-        if (selectedDoc === "inn") regex = /^\d{12}$/;
-
-        if (!regex.test(docVal)) {
-          setValidationStyle(documentInput, false);
-          valid = false;
+      const selected = document.querySelector('input[name="docType"]:checked');
+      if (selected) {
+        if (selected.value === "passport" && /^\d{4}\s\d{6}$/.test(docInput.value.trim())) {
+          docInput.classList.add("valid");
+          docInput.classList.remove("invalid");
+        } else if (selected.value === "snils" && /^\d{3}-\d{3}-\d{3}\s\d{2}$/.test(docInput.value.trim())) {
+          docInput.classList.add("valid");
+          docInput.classList.remove("invalid");
+        } else if (selected.value === "inn" && /^\d{12}$/.test(docInput.value.trim())) {
+          docInput.classList.add("valid");
+          docInput.classList.remove("invalid");
         } else {
-          setValidationStyle(documentInput, true);
+          docInput.classList.add("invalid");
+          docInput.classList.remove("valid");
+          valid = false;
         }
-      } else valid = false;
+      } else {
+        valid = false;
+        docInput.classList.add("invalid");
+      }
 
-      // Чекбокс "я не робот"
-      if (!notRobot.checked) valid = false;
+      // Я не робот
+      const notRobot = document.getElementById("notRobot");
+      if (!notRobot.checked) {
+        alert("Подтвердите, что вы не робот");
+        valid = false;
+      }
 
-      nextBtn.disabled = !valid;
+      if (valid) {
+        alert("✅ Данные введены корректно!");
+      } else {
+        alert("❌ Проверьте правильность введённых данных.");
+      }
     }
-
-    // Маска телефона
-    phoneField.addEventListener("input", e => {
-      let v = e.target.value.replace(/\D/g, "");
-      if (v.startsWith("7")) v = v.substring(1);
-      if (v.length > 10) v = v.substring(0,10);
-      let formatted = "+7";
-      if (v.length > 0) formatted += " (" + v.substring(0,3);
-      if (v.length >= 3) formatted += ") " + v.substring(3,6);
-      if (v.length >= 6) formatted += "-" + v.substring(6,8);
-      if (v.length >= 8) formatted += "-" + v.substring(8,10);
-      e.target.value = formatted;
-      validateForm();
-    });
-
-    // Выбор документа
-    docType.addEventListener("change", () => {
-      selectedDoc = docType.value;
-      docField.style.display = selectedDoc ? "block" : "none";
-      documentInput.value = "";
-      documentInput.classList.remove("valid","invalid");
-
-      if (selectedDoc === "passport") {
-        documentInput.placeholder = "Паспорт";
-        docExample.innerText = "Пример: 1234 567890";
-      }
-      if (selectedDoc === "snils") {
-        documentInput.placeholder = "СНИЛС";
-        docExample.innerText = "Пример: 112-233-445 95";
-      }
-      if (selectedDoc === "inn") {
-        documentInput.placeholder = "ИНН";
-        docExample.innerText = "Пример: 123456789012";
-      }
-
-      validateForm();
-    });
-
-    fioField.addEventListener("input", validateForm);
-    documentInput.addEventListener("input", validateForm);
-    notRobot.addEventListener("change", validateForm);
-
-    document.getElementById("dataForm").addEventListener("submit", e => {
-      e.preventDefault();
-      if (!nextBtn.disabled) alert("✅ Данные успешно введены!");
-    });
   </script>
 </body>
 </html>
