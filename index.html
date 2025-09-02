@@ -2,184 +2,107 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>ФЕНИКС — обновление данных</title>
+  <title>Phenix Bot</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-    .container { max-width: 500px; margin: auto; background: #fff; padding: 25px; border-radius: 14px; box-shadow: 0 3px 12px rgba(0,0,0,0.18); }
-    .step { display: none; }
-    .step.active { display: block; }
-
-    h2, h3 {
-      margin-bottom: 12px;
-      font-weight: 700;
-      font-size: 1.5em;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 10px;
+      height: 100vh;
+      margin: 0;
     }
 
-    input {
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+      max-width: 400px;
+      text-align: center;
     }
 
-    .buttons { margin-top: 18px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    button { padding: 13px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: #333;
+    }
 
-    button:disabled { background: #ccc; cursor: not-allowed; }
-    .next { background: #007bff; color: #fff; }
-    .back { background: #6c757d; color: #fff; }
-    .doc-btn { background: #17a2b8; color: #fff; flex: 1; }
+    .form-input {
+      width: 100%;
+      max-width: 320px;
+      height: 45px;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
 
-    .error { color: red; font-size: 15px; margin-top: 6px; font-weight: 600; }
-    .example { margin: 6px 0; color: #333; font-size: 14px; font-style: italic; }
+    .form-input:focus {
+      border-color: #007bff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+
+    .example {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <form id="wizardForm">
+    <h2>📝 Введите данные</h2>
 
-      <!-- Вступление -->
-      <div class="step active">
-        <h2>🔥 ФЕНИКС — обновление данных</h2>
-        <p>🐦 Добро пожаловать в сервис восстановления связи.</p>
-        <p>📋 Вам потребуется указать ФИО, телефон и один документ.</p>
-        <p>⚡ Все данные проверяются автоматически.</p>
-        <div class="buttons">
-          <button type="button" class="next">➡️ Начать</button>
-        </div>
-      </div>
+    <input type="text" class="form-input" placeholder="ФИО">
+    <div class="example">Пример: Иванов Иван Иванович</div>
 
-      <!-- ФИО -->
-      <div class="step">
-        <h3>👤 ФИО</h3>
-        <input type="text" id="fullname" placeholder="Иванов Иван Иванович" required>
-        <div class="error" id="err-fullname"></div>
-        <div class="buttons">
-          <button type="button" class="back">⬅️ Назад</button>
-          <button type="button" class="next">➡️ Далее</button>
-        </div>
-      </div>
+    <input type="text" class="form-input" placeholder="Паспорт">
+    <div class="example">Пример: 1234 567890</div>
 
-      <!-- Телефон -->
-      <div class="step">
-        <h3>📞 Телефон</h3>
-        <input type="tel" id="phone" placeholder="+79991234567" required>
-        <div class="error" id="err-phone"></div>
-        <div class="buttons">
-          <button type="button" class="back">⬅️ Назад</button>
-          <button type="button" class="next">➡️ Далее</button>
-        </div>
-      </div>
+    <input type="text" class="form-input" placeholder="СНИЛС">
+    <div class="example">Пример: 112-233-445 95</div>
 
-      <!-- Выбор документа -->
-      <div class="step">
-        <h3>📄 Выберите документ</h3>
-        <div class="buttons">
-          <button type="button" class="doc-btn" data-doc="passport">📄 Паспорт</button>
-          <button type="button" class="doc-btn" data-doc="inn">🧾 ИНН</button>
-          <button type="button" class="doc-btn" data-doc="snils">🟢 СНИЛС</button>
-        </div>
-        <div class="buttons">
-          <button type="button" class="back">⬅️ Назад</button>
-        </div>
-      </div>
+    <input type="text" class="form-input" placeholder="ИНН">
+    <div class="example">Пример: 123456789012</div>
 
-      <!-- Номер документа -->
-      <div class="step">
-        <h3 id="doc-title">🔢 Номер документа</h3>
-        <div id="doc-example" class="example"></div>
-        <input type="text" id="docnumber" required>
-        <div class="error" id="err-doc"></div>
-        <div class="buttons">
-          <button type="button" class="back">⬅️ Назад</button>
-          <button type="button" class="next">➡️ Завершить</button>
-        </div>
-      </div>
-
-      <!-- Финал -->
-      <div class="step">
-        <h3>✅ Всё готово!</h3>
-        <p>Проверьте данные и подтвердите:</p>
-        <a href="https://redirect.figma.site/" target="_blank">
-          <button type="button" class="next">Я не робот ✅</button>
-        </a>
-        <div class="buttons">
-          <button type="button" class="back">⬅️ Назад</button>
-        </div>
-      </div>
-
-    </form>
+    <div>
+      <button class="btn btn-secondary">⬅ Назад</button>
+      <button class="btn btn-primary">➡ Далее</button>
+    </div>
   </div>
-
-<script>
-const steps = document.querySelectorAll('.step');
-let currentStep = 0;
-let selectedDoc = null;
-
-function showStep(n) {
-  steps.forEach((s,i)=>s.classList.toggle('active', i===n));
-  currentStep = n;
-}
-
-document.querySelectorAll('.next').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    if (!validateStep(currentStep)) return;
-    if (currentStep < steps.length-1) showStep(currentStep+1);
-  });
-});
-
-document.querySelectorAll('.back').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ if (currentStep>0) showStep(currentStep-1); });
-});
-
-document.querySelectorAll('.doc-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    selectedDoc = btn.dataset.doc;
-    const docnumber = document.getElementById('docnumber');
-    const example = document.getElementById('doc-example');
-    if (selectedDoc==="passport") {
-      docnumber.pattern="^\\d{4}\\s\\d{6}$";
-      example.textContent="Пример паспорта: 4510 123456";
-    }
-    if (selectedDoc==="inn") {
-      docnumber.pattern="^\\d{10}(\\d{2})?$";
-      example.textContent="Пример ИНН: 500100732259";
-    }
-    if (selectedDoc==="snils") {
-      docnumber.pattern="^\\d{3}-\\d{3}-\\d{3}\\s\\d{2}$";
-      example.textContent="Пример СНИЛС: 112-233-445 95";
-    }
-    showStep(currentStep+1);
-  });
-});
-
-function validateStep(step) {
-  let val, re;
-  if (step===1) {
-    val=document.getElementById('fullname').value.trim();
-    re=/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/;
-    if(!re.test(val)) {document.getElementById('err-fullname').textContent="Введите ФИО полностью кириллицей"; return false;}
-    document.getElementById('err-fullname').textContent=""; return true;
-  }
-  if (step===2) {
-    val=document.getElementById('phone').value.trim();
-    re=/^(\+7|7)\d{10}$/;
-    if(!re.test(val)) {document.getElementById('err-phone').textContent="Телефон в формате +79991234567"; return false;}
-    document.getElementById('err-phone').textContent=""; return true;
-  }
-  if (step===4) {
-    val=document.getElementById('docnumber').value.trim();
-    re=new RegExp(document.getElementById('docnumber').pattern);
-    if(!re.test(val)) {document.getElementById('err-doc').textContent="Неверный формат номера"; return false;}
-    document.getElementById('err-doc').textContent=""; return true;
-  }
-  return true;
-}
-</script>
 </body>
 </html>
