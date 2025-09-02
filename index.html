@@ -142,7 +142,7 @@
 
     function validatePhone() {
       const phone = document.getElementById("phone").value.trim();
-      if (/^\+7\d{10}$/.test(phone)) {
+      if (/^(\+7|7|8)\d{10}$/.test(phone)) {
         nextStep(3);
       } else {
         alert("Введите телефон в формате: +79991234567");
