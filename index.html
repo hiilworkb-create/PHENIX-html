@@ -22,9 +22,10 @@
       max-width: 420px;
       width: 100%;
       text-align: center;
+      border: 2px solid #4b0082; /* темно-фиолетовая рамка */
     }
     h1 {
-      color: #7c3aed;
+      color: #4b0082; /* темно-фиолетовый */
       font-size: 24px;
       margin-bottom: 25px;
     }
@@ -35,37 +36,42 @@
       margin: 10px 0;
       border-radius: 12px;
       border: none;
-      background: #7c3aed;
+      background: #4b0082; /* темно-фиолетовый */
       color: #fff;
       font-size: 16px;
       cursor: pointer;
       transition: 0.2s;
     }
-    button:hover { background: #5b21b6; }
-    .back-btn { background: #5b21b6; }
-    .back-btn:hover { background: #4c1d95; }
-    .faq-btn { background: #7c3aed; }
-    .faq-btn:hover { background: #5b21b6; }
+    button:hover { background: #6a0dad; } /* немного светлее при hover */
+    .back-btn { background: #6a0dad; }
+    .back-btn:hover { background: #7b1fa2; }
+    .faq-btn { background: #4b0082; }
+    .faq-btn:hover { background: #6a0dad; }
     input, select {
       width: 100%;
       padding: 14px;
       margin: 10px 0 15px 0;
       border-radius: 10px;
-      border: 2px solid #7c3aed;
+      border: 2px solid #4b0082;
       font-size: 16px;
       text-align: center;
       box-sizing: border-box;
+      color: #4b0082;
     }
     .hidden { display: none; }
     .success {
       font-size: 18px;
-      color: #7c3aed;
+      color: #4b0082;
       font-weight: bold;
       text-align: center;
       line-height: 1.5;
     }
     .success button {
       margin-top: 15px;
+      background: #4b0082;
+    }
+    .success button:hover {
+      background: #6a0dad;
     }
     p { margin: 10px 0; text-align: center; }
   </style>
