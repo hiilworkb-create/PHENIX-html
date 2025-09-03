@@ -22,13 +22,9 @@
       max-width: 420px;
       width: 100%;
       text-align: center;
-      border: 2px solid #4b0082; /* темно-фиолетовая рамка */
+      border: 2px solid #4b0082;
     }
-    h1 {
-      color: #4b0082; /* темно-фиолетовый */
-      font-size: 24px;
-      margin-bottom: 25px;
-    }
+    h1 { color: #4b0082; font-size: 24px; margin-bottom: 25px; }
     button {
       display: block;
       width: 100%;
@@ -36,17 +32,15 @@
       margin: 10px 0;
       border-radius: 12px;
       border: none;
-      background: #4b0082; /* темно-фиолетовый */
+      background: #4b0082;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
       transition: 0.2s;
     }
-    button:hover { background: #6a0dad; } /* немного светлее при hover */
+    button:hover { background: #6a0dad; }
     .back-btn { background: #6a0dad; }
     .back-btn:hover { background: #7b1fa2; }
-    .faq-btn { background: #4b0082; }
-    .faq-btn:hover { background: #6a0dad; }
     input, select {
       width: 100%;
       padding: 14px;
@@ -59,20 +53,9 @@
       color: #4b0082;
     }
     .hidden { display: none; }
-    .success {
-      font-size: 18px;
-      color: #4b0082;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.5;
-    }
-    .success button {
-      margin-top: 15px;
-      background: #4b0082;
-    }
-    .success button:hover {
-      background: #6a0dad;
-    }
+    .success { font-size: 18px; color: #4b0082; font-weight: bold; text-align: center; line-height: 1.5; }
+    .success button { margin-top: 15px; background: #4b0082; }
+    .success button:hover { background: #6a0dad; }
     p { margin: 10px 0; text-align: center; }
   </style>
 </head>
@@ -150,6 +133,8 @@
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEDHyl9xje0htN8Q1i50KV_uJ15479sp2BjYyaXeASpdu_NtECCNyMiIvJ6B8UM1Ui/exec";
+
     function goHome() {
       hideAll();
       document.getElementById("menu").classList.remove("hidden");
@@ -197,10 +182,24 @@
         document_type: document.getElementById("document_type").value,
         document_number: document.getElementById("document_number").value
       };
-      console.log("Отправляем данные:", data);
 
-      hideAll();
-      document.getElementById("success").classList.remove("hidden");
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(response => response.json())
+      .then(result => {
+        if(result.result === "success"){
+          hideAll();
+          document.getElementById("success").classList.remove("hidden");
+        } else {
+          alert("Ошибка отправки: " + result.message);
+        }
+      })
+      .catch(error => {
+        alert("Ошибка сети: " + error);
+      });
     });
   </script>
 </body>
