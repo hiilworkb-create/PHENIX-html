@@ -19,7 +19,7 @@
     }
 
     * {
-      box-sizing: box-box;
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
@@ -66,6 +66,9 @@
     .input-group {
       margin-bottom: 20px;
       text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
 
     input {
@@ -78,6 +81,7 @@
       background: var(--input-bg);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       transition: border-color 0.3s, box-shadow 0.3s;
+      box-sizing: border-box; /* Ensure padding doesn't affect width */
     }
 
     input:focus {
@@ -533,7 +537,7 @@
         const password = prompt('Введите код для доступа к данным:');
         if (password === '1321') {
           this.toggleDataTable();
-        } else if (password !== null) { // Check if user canceled the prompt
+        } else if (password !== null) {
           alert('Неверный код! Попробуйте снова.');
         }
       }
@@ -592,14 +596,21 @@
           },
           'document-number': () => {
             const val = this.sanitizeInput(document.getElementById('docnumber').value.trim());
-            const re = new RegExp(document.getElementById('docnumber').pattern);
+            const docType = this.formData['document-type'];
+            const docnumber = document.getElementById('docnumber');
             const error = document.getElementById('err-doc');
             if (!val) {
               error.textContent = 'Поле номера документа обязательно';
               return false;
             }
+            const configs = {
+              'Паспорт': { pattern: '^\\d{4}\\s\\d{6}$', example: 'Пример: 4510 123456' },
+              'ИНН': { pattern: '^\\d{10}(\\d{2})?$', example: 'Пример: 500100732259' },
+              'СНИЛС': { pattern: '^\\d{3}-\\d{3}-\\d{3}\\s\\d{2}$', example: 'Пример: 112-233-445 95' }
+            };
+            const re = new RegExp(configs[docType].pattern);
             if (!re.test(val)) {
-              error.textContent = 'Неверный формат номера документа';
+              error.textContent = 'Неверный формат номера документа. ' + configs[docType].example;
               return false;
             }
             error.textContent = '';
