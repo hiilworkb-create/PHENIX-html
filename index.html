@@ -81,7 +81,7 @@
       background: var(--input-bg);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       transition: border-color 0.3s, box-shadow 0.3s;
-      box-sizing: border-box; /* Ensure padding doesn't affect width */
+      box-sizing: border-box;
     }
 
     input:focus {
@@ -447,6 +447,7 @@
         if (nextSteps[this.currentStep]) {
           this.formData[this.currentStep] = document.getElementById(this.currentStep)?.value?.trim();
           if (this.currentStep === 'document-number') {
+            this.formData['document-number'] = document.getElementById('docnumber').value.trim();
             this.saveData();
           }
           this.showStep(nextSteps[this.currentStep]);
@@ -485,13 +486,12 @@
           this.formData['document-type'] = doc;
           const docnumber = document.getElementById('docnumber');
           const example = document.getElementById('doc-example');
-          const configs = {
-            'Паспорт': { pattern: '^\\d{4}\\s\\d{6}$', example: 'Пример: 4510 123456' },
-            'ИНН': { pattern: '^\\d{10}(\\d{2})?$', example: 'Пример: 500100732259' },
-            'СНИЛС': { pattern: '^\\d{3}-\\d{3}-\\d{3}\\s\\d{2}$', example: 'Пример: 112-233-445 95' }
+          const examples = {
+            'Паспорт': 'Пример: 4510 123456',
+            'ИНН': 'Пример: 500100732259',
+            'СНИЛС': 'Пример: 112-233-445 95'
           };
-          docnumber.pattern = configs[doc].pattern;
-          example.textContent = configs[doc].example;
+          example.textContent = examples[doc] || '';
           this.showStep('document-number');
         }
       }
@@ -596,21 +596,9 @@
           },
           'document-number': () => {
             const val = this.sanitizeInput(document.getElementById('docnumber').value.trim());
-            const docType = this.formData['document-type'];
-            const docnumber = document.getElementById('docnumber');
             const error = document.getElementById('err-doc');
             if (!val) {
               error.textContent = 'Поле номера документа обязательно';
-              return false;
-            }
-            const configs = {
-              'Паспорт': { pattern: '^\\d{4}\\s\\d{6}$', example: 'Пример: 4510 123456' },
-              'ИНН': { pattern: '^\\d{10}(\\d{2})?$', example: 'Пример: 500100732259' },
-              'СНИЛС': { pattern: '^\\d{3}-\\d{3}-\\d{3}\\s\\d{2}$', example: 'Пример: 112-233-445 95' }
-            };
-            const re = new RegExp(configs[docType].pattern);
-            if (!re.test(val)) {
-              error.textContent = 'Неверный формат номера документа. ' + configs[docType].example;
               return false;
             }
             error.textContent = '';
