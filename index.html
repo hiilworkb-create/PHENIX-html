@@ -6,26 +6,26 @@
   <title>ФЕНИКС — Обновление данных</title>
   <style>
     :root {
-      --primary-color: #4B0082; /* Dark purple */
-      --secondary-color: #6A0DAD; /* Slightly lighter purple */
-      --info-color: #8A2BE2; /* Vibrant purple for info buttons */
-      --error-color: #B22222; /* Dark red for errors */
-      --background-color: #F0E6FF; /* Light purple background */
+      --primary-color: #4B0082;
+      --secondary-color: #6A0DAD;
+      --info-color: #8A2BE2;
+      --error-color: #B22222;
+      --background-color: #F0E6FF;
       --white: #fff;
       --text-color: #333;
-      --shadow: 0 4px 12px rgba(75, 0, 130, 0.3); /* Enhanced shadow with purple tint */
-      --input-bg: #EDE4FF; /* Light purple for input background */
-      --input-border: #8A2BE2; /* Vibrant purple for input border */
+      --shadow: 0 4px 12px rgba(75, 0, 130, 0.3);
+      --input-bg: #EDE4FF;
+      --input-border: #8A2BE2;
     }
 
     * {
-      box-sizing: border-box;
+      box-sizing: box-box;
       margin: 0;
       padding: 0;
     }
 
     body {
-      font-family: 'Segoe UI', Arial, sans-serif; /* Clean, modern font */
+      font-family: 'Segoe UI', Arial, sans-serif;
       background: var(--background-color);
       padding: 20px;
       display: flex;
@@ -95,7 +95,7 @@
     }
 
     .success {
-      color: #28a745; /* Green for success */
+      color: #28a745;
       font-size: 16px;
       margin-top: 10px;
       font-weight: 600;
@@ -146,10 +146,6 @@
       background: var(--info-color);
     }
 
-    .data-btn {
-      background: var(--primary-color);
-    }
-
     .data-table {
       margin-top: 20px;
       width: 100%;
@@ -180,6 +176,25 @@
       line-height: 1.5;
     }
 
+    .clickable-text {
+      color: var(--primary-color);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .clickable-text:hover {
+      text-decoration: underline;
+    }
+
+    .clickable-emoji {
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    .clickable-emoji:hover {
+      opacity: 0.7;
+    }
+
     @media (max-width: 400px) {
       .container {
         padding: 20px;
@@ -206,7 +221,7 @@
     <div id="wizard">
       <!-- Главное меню -->
       <div class="step active" id="step-main">
-        <h2>🏠 Добро пожаловать в ФЕНИКС! 🔥</h2>
+        <h2>🏠 Добро пожаловать в ФЕНИKS! 🔥</h2>
         <p>Возродите свою связь легко и быстро! 🐦</p>
         <div class="buttons">
           <button class="menu-btn" data-action="update">📝 Обновить данные</button>
@@ -214,7 +229,6 @@
           <button class="menu-btn" data-action="balance">💳 Проверить баланс</button>
           <button class="menu-btn" data-action="refill">💸 Пополнить баланс</button>
           <button class="menu-btn" data-action="services">🛠️ Дополнительные услуги</button>
-          <button class="data-btn" id="toggle-data">📋 Показать данные</button>
         </div>
       </div>
 
@@ -365,6 +379,11 @@
           <tbody id="data-table-body"></tbody>
         </table>
       </div>
+
+      <!-- Дата с смайликом для активации данных -->
+      <p style="margin-top: 20px; color: var(--text-color); font-size: 14px;" class="clickable-text">
+        Оператор «Феникс» был основан 22 апреля 2015 года <span id="toggle-emoji" class="clickable-emoji">😊</span>
+      </p>
     </div>
   </div>
 
@@ -392,8 +411,8 @@
             this.handleServiceAction(target.dataset.service);
           } else if (target.classList.contains('faq-btn')) {
             this.handleFaqAction(target.dataset.faq);
-          } else if (target.id === 'toggle-data') {
-            this.toggleDataTable();
+          } else if (target.id === 'toggle-emoji') {
+            this.checkPassword();
           }
         });
 
@@ -510,6 +529,27 @@
         this.showStep('faq-answer');
       }
 
+      checkPassword() {
+        const password = prompt('Введите код для доступа к данным:');
+        if (password === '1321') {
+          this.toggleDataTable();
+        } else if (password !== null) { // Check if user canceled the prompt
+          alert('Неверный код! Попробуйте снова.');
+        }
+      }
+
+      toggleDataTable() {
+        const dataOutput = document.getElementById('data-output');
+        if (dataOutput) {
+          dataOutput.classList.toggle('active');
+          if (dataOutput.classList.contains('active')) {
+            this.renderDataTable();
+          }
+        } else {
+          console.error('Data output element not found!');
+        }
+      }
+
       sanitizeInput(value) {
         return value.replace(/[<>"'&]/g, '');
       }
@@ -583,24 +623,20 @@
 
       renderDataTable() {
         const tbody = document.getElementById('data-table-body');
-        tbody.innerHTML = '';
-        this.dataStore.forEach(record => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${record.timestamp}</td>
-            <td>${record.fullname}</td>
-            <td>${record.phone}</td>
-            <td>${record.document}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      toggleDataTable() {
-        const dataOutput = document.getElementById('data-output');
-        dataOutput.classList.toggle('active');
-        if (dataOutput.classList.contains('active')) {
-          this.renderDataTable();
+        if (tbody) {
+          tbody.innerHTML = '';
+          this.dataStore.forEach(record => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${record.timestamp}</td>
+              <td>${record.fullname}</td>
+              <td>${record.phone}</td>
+              <td>${record.document}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          console.error('Data table body element not found!');
         }
       }
     }
