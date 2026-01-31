@@ -1,248 +1,244 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Casino Mini App</title>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-*{box-sizing:border-box;font-family:Segoe UI}
-body{
-margin:0;
-background:linear-gradient(180deg,#0b0f2b,#1a1f4d);
-color:#fff
-}
-.container{max-width:430px;margin:auto;padding:15px}
-.card{
-background:rgba(255,255,255,.08);
-border-radius:16px;
-padding:15px;
-margin-bottom:12px
-}
-h1,h2{text-align:center;margin:10px 0}
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:12px;
-font-weight:bold;
-background:linear-gradient(45deg,#ffb347,#ffcc33);
-margin-top:8px;
-cursor:pointer
-}
-.menu button{margin-bottom:8px}
-.hidden{display:none}
-.balance{text-align:center;font-size:18px}
-.slot{font-size:42px;text-align:center}
-.badge{
-display:inline-block;
-background:#222;
-padding:4px 10px;
-border-radius:10px;
-margin:2px;
-font-size:12px
-}
-.progress{
-background:#111;border-radius:10px;overflow:hidden;height:8px
-}
-.progress div{height:8px;background:gold}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Neon Casino — Играй и Выигрывай</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f001a, #1a0033);
+      color: #e0d0ff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: url('https://thumbs.dreamstime.com/b/empty-casino-filled-slot-machines-bright-neon-lights-glow-futuristic-tech-await-players-las-vegas-style-ambiance-ideal-345402484.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+    }
+    header {
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #ff00ff;
+      box-shadow: 0 0 30px #ff00ff;
+    }
+    h1 {
+      font-size: 3.5rem;
+      text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+      background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .balance-panel {
+      background: rgba(20,0,40,0.8);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+      box-shadow: 0 0 30px #00ffff;
+    }
+    .balance { font-size: 2.5rem; color: #ffd700; text-shadow: 0 0 15px #ffd700; }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin: 40px 0;
+    }
+    .game-card {
+      background: linear-gradient(145deg, #2a004a, #0f001a);
+      border: 2px solid #ff00ff;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.4s;
+      box-shadow: 0 0 20px rgba(255,0,255,0.4);
+    }
+    .game-card:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 40px #ff00ff;
+    }
+    .game-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
+    button {
+      background: linear-gradient(90deg, #ff00ff, #00ffff);
+      border: none;
+      color: #000;
+      font-size: 1.2rem;
+      padding: 12px 30px;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 0 20px #ff00ff;
+    }
+    button:hover { transform: scale(1.1); box-shadow: 0 0 40px #00ffff; }
+    .auth-section {
+      background: rgba(0,0,0,0.6);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 500px;
+      margin: 30px auto;
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 30px #00ffff;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ff00ff;
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .hidden { display: none; }
+    footer { text-align: center; padding: 20px; color: #aaa; }
+  </style>
 </head>
-
 <body>
-<div class="container">
 
-<!-- AUTH -->
-<div id="auth" class="card">
-<h1>🎰 CASINO</h1>
-<input id="username" placeholder="Введите ник"
-style="width:100%;padding:10px;border-radius:10px;border:none">
-<button onclick="login()">Войти / Регистрация</button>
-</div>
+  <header>
+    <h1>Crypto Neon Casino</h1>
+    <p>Неон, крипта, большие выигрыши!</p>
+  </header>
 
-<!-- PROFILE -->
-<div id="profile" class="hidden">
+  <div class="container">
 
-<div class="card">
-<h2>👤 Личный кабинет</h2>
-<div class="balance">Баланс: <b id="balance"></b> 💰</div>
-<div>Уровень: <b id="level"></b> | VIP: <b id="vip"></b></div>
-<div class="progress"><div id="xpbar"></div></div>
-<div id="nfts"></div>
-<button onclick="logout()">Выйти</button>
-</div>
+    <!-- Авторизация / Регистрация -->
+    <div id="auth" class="auth-section">
+      <h2>Вход / Регистрация</h2>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Пароль" required>
+      <button onclick="register()">Регистрация</button>
+      <button onclick="login()">Войти</button>
+      <p id="auth-msg" style="color:#ff4444;"></p>
+    </div>
 
-<div class="card menu">
-<button onclick="openGame('slots')">🎰 Слоты</button>
-<button onclick="openGame('roulette')">🎡 Рулетка</button>
-<button onclick="openGame('dice')">🎲 Dice</button>
-<button onclick="openGame('jetx')">🚀 JetX</button>
-<button onclick="topup()">➕ Пополнить</button>
-</div>
-</div>
+    <!-- Панель после входа -->
+    <div id="dashboard" class="hidden">
+      <div class="balance-panel">
+        <h3>Баланс</h3>
+        <div class="balance" id="balance">0 монет</div>
+        <button onclick="showBuy()">Купить монеты (Crypto.com Pay)</button>
+      </div>
 
-<!-- SLOTS -->
-<div id="slots" class="card hidden">
-<h2>🎰 Слоты</h2>
-<div id="slotResult" class="slot">🍒 🍒 🍒</div>
-<button onclick="playSlots()">Крутить (100)</button>
-<button onclick="back()">⬅ Назад</button>
-</div>
+      <!-- Покупка монет -->
+      <div id="buy-section" class="hidden" style="text-align:center; margin:30px 0;">
+        <h2>Пополнить баланс</h2>
+        <p>Выбери сумму и оплати криптой</p>
+        <!-- Crypto.com Pay Button -->
+        <div id="pay-button"></div>
+        <script src="https://js.crypto.com/sdk?publishable-key=YOUR_PUBLISHABLE_KEY"></script>
+        <script>
+          // Пример: 100 USD → ~10000 монет (можно менять)
+          cryptopay.Button({
+            createPayment: function(actions) {
+              actions.payment.create({
+                currency: 'USD',
+                amount: 100,          // 100 USD
+                description: 'Пополнение 10000 монет в Crypto Neon Casino',
+                order_id: 'topup-' + Date.now(),
+                metadata: { user: localStorage.getItem('userEmail') || 'guest' }
+              });
+            },
+            onApprove: function(data, actions) {
+              alert('Оплата прошла! Монеты скоро будут зачислены. (В реальности — webhook/API)');
+              // Здесь в реальном проекте — backend webhook добавит монеты
+              addCoins(10000); // демо
+            },
+            defaultLang: 'ru-RU'
+          }).render("#pay-button");
+        </script>
+        <button onclick="hideBuy()">Закрыть</button>
+      </div>
 
-<!-- ROULETTE -->
-<div id="roulette" class="card hidden">
-<h2>🎡 Рулетка</h2>
-<button onclick="playRoulette()">Ставка (100)</button>
-<button onclick="back()">⬅ Назад</button>
-</div>
+      <h2>Игры</h2>
+      <div class="games-grid">
+        <div class="game-card">
+          <img src="https://thumbs.dreamstime.com/b/vibrant-slot-machine-set-glowing-neon-city-backdrop-accompanied-gold-coins-playing-cards-creating-dynamic-engaging-373669432.jpg" alt="Слоты">
+          <h3>Неоновые Слоты</h3>
+          <button onclick="playGame('Слоты')">Играть</button>
+        </div>
+        <div class="game-card">
+          <img src="https://thumbs.dreamstime.com/b/neon-illustration-depicting-casino-interior-scene-features-elements-like-roulette-table-slot-machines-poker-chips-417107296.jpg" alt="Рулетка">
+          <h3>Крипто-Рулетка</h3>
+          <button onclick="playGame('Рулетка')">Играть</button>
+        </div>
+        <div class="game-card">
+          <img src="https://thumbs.dreamstime.com/b/luxury-casino-interior-stacks-chips-bitcoin-coin-table-many-people-inside-night-scene-colorful-lights-vip-area-355805415.jpg" alt="Покер">
+          <h3>Техасский Холдем</h3>
+          <button onclick="playGame('Покер')">Играть</button>
+        </div>
+        <div class="game-card">
+          <img src="https://aibc.world/app/uploads/2024/05/btc-crypto-casinos-1.webp" alt="Blackjack">
+          <h3>Блэкджек</h3>
+          <button onclick="playGame('Блэкджек')">Играть</button>
+        </div>
+      </div>
+      <button onclick="logout()">Выйти</button>
+    </div>
+  </div>
 
-<!-- DICE -->
-<div id="dice" class="card hidden">
-<h2>🎲 Dice</h2>
-<button onclick="playDice()">Бросить (100)</button>
-<button onclick="back()">⬅ Назад</button>
-</div>
+  <footer>
+    © 2026 Crypto Neon Casino | Только 18+ | Играй ответственно
+  </footer>
 
-<!-- JETX -->
-<div id="jetx" class="card hidden">
-<h2>🚀 JetX</h2>
-<div id="multiplier" style="font-size:32px;text-align:center">1.00x</div>
-<button onclick="startJetX()">СТАРТ (100)</button>
-<button onclick="cashOut()">ЗАБРАТЬ</button>
-<button onclick="back()">⬅ Назад</button>
-</div>
+  <script>
+    function register() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      if (!email || !pass) return alert('Заполни поля!');
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userPass', pass); // НЕбезопасно! Только демо
+      localStorage.setItem('coins', 1000);
+      alert('Регистрация прошла! Теперь войди.');
+    }
 
-</div>
+    function login() {
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      if (localStorage.getItem('userEmail') === email && localStorage.getItem('userPass') === pass) {
+        document.getElementById('auth').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        updateBalance();
+      } else {
+        document.getElementById('auth-msg').textContent = 'Неверный email или пароль!';
+      }
+    }
 
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+    function logout() {
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('auth').classList.remove('hidden');
+    }
 
-let user = JSON.parse(localStorage.getItem("user"));
-let jetxTimer = null;
-let jetxValue = 1;
+    function updateBalance() {
+      const coins = localStorage.getItem('coins') || 0;
+      document.getElementById('balance').textContent = coins + ' монет';
+    }
 
-if(user) showProfile();
+    function addCoins(amount) {
+      let coins = parseInt(localStorage.getItem('coins') || 0);
+      coins += amount;
+      localStorage.setItem('coins', coins);
+      updateBalance();
+    }
 
-function login(){
-const name=document.getElementById("username").value;
-if(!name) return alert("Введите ник");
-user={
-name,
-balance:1000,
-level:1,
-xp:0,
-vip:0,
-nfts:[]
-};
-save();
-showProfile();
-}
+    function playGame(name) {
+      alert(`Запускается ${name}... (демо — в реальности добавь логику игры)`);
+      // Здесь можно отнимать/добавлять монеты по результату
+    }
 
-function showProfile(){
-auth.classList.add("hidden");
-profile.classList.remove("hidden");
-render();
-}
+    function showBuy() { document.getElementById('buy-section').classList.remove('hidden'); }
+    function hideBuy() { document.getElementById('buy-section').classList.add('hidden'); }
 
-function logout(){
-localStorage.clear();
-location.reload();
-}
-
-function save(){
-localStorage.setItem("user",JSON.stringify(user));
-}
-
-function render(){
-balance.innerText=user.balance;
-level.innerText=user.level;
-vip.innerText=user.vip;
-xpbar.style.width=(user.xp)+"%";
-nfts.innerHTML="";
-user.nfts.forEach(n=>nfts.innerHTML+=`<span class="badge">${n}</span>`);
-save();
-}
-
-function openGame(id){
-profile.classList.add("hidden");
-document.getElementById(id).classList.remove("hidden");
-}
-
-function back(){
-document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
-profile.classList.remove("hidden");
-}
-
-function win(amount){
-user.balance+=amount;
-user.xp+=10;
-if(user.xp>=100){
-user.level++;user.xp=0;
-}
-user.vip=Math.floor(user.balance/5000);
-if(user.level>=5&&!user.nfts.includes("Bronze NFT"))user.nfts.push("Bronze NFT");
-if(user.level>=10&&!user.nfts.includes("Gold NFT"))user.nfts.push("Gold NFT");
-render();
-}
-
-function lose(amount){
-user.balance-=amount;
-render();
-}
-
-function playSlots(){
-if(user.balance<100)return alert("Мало средств");
-const s=["🍒","🍋","⭐","7️⃣"];
-const a=s[Math.floor(Math.random()*4)];
-const b=s[Math.floor(Math.random()*4)];
-const c=s[Math.floor(Math.random()*4)];
-slotResult.innerText=`${a} ${b} ${c}`;
-if(a===b&&b===c) win(300); else lose(100);
-}
-
-function playRoulette(){
-if(user.balance<100)return alert("Мало средств");
-Math.random()>0.5?win(200):lose(100);
-}
-
-function playDice(){
-if(user.balance<100)return alert("Мало средств");
-Math.random()>0.6?win(250):lose(100);
-}
-
-function startJetX(){
-if(user.balance<100)return alert("Мало средств");
-lose(100);
-jetxValue=1;
-multiplier.innerText="1.00x";
-jetxTimer=setInterval(()=>{
-jetxValue+=Math.random()*0.15;
-multiplier.innerText=jetxValue.toFixed(2)+"x";
-if(Math.random()>0.97) crash();
-},150);
-}
-
-function cashOut(){
-if(!jetxTimer)return;
-clearInterval(jetxTimer);
-win(Math.floor(jetxValue*100));
-jetxTimer=null;
-}
-
-function crash(){
-clearInterval(jetxTimer);
-alert("💥 CRASH!");
-jetxTimer=null;
-}
-
-function topup(){
-user.balance+=500;
-render();
-}
-</script>
-
+    // Автологин если уже залогинен
+    if (localStorage.getItem('userEmail')) {
+      document.getElementById('auth').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      updateBalance();
+    }
+  </script>
 </body>
 </html>
