@@ -1,670 +1,248 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ФЕНИКС — Обновление данных</title>
-  <style>
-    :root {
-      --primary-color: #4B0082;
-      --secondary-color: #6A0DAD;
-      --info-color: #8A2BE2;
-      --error-color: #B22222;
-      --background-color: #F0E6FF;
-      --white: #fff;
-      --text-color: #333;
-      --shadow: 0 4px 12px rgba(75, 0, 130, 0.3);
-      --input-bg: #EDE4FF;
-      --input-border: #8A2BE2;
-      --table-header-bg: linear-gradient(90deg, #4B0082, #6A0DAD);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino Mini App</title>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: var(--background-color);
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 500px;
-      width: 100%;
-      background: var(--white);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .step {
-      display: none;
-      text-align: left;
-    }
-
-    .step.active {
-      display: block;
-    }
-
-    h2, h3 {
-      margin-bottom: 20px;
-      font-weight: 700;
-      font-size: 1.6em;
-      color: var(--primary-color);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      line-height: 1.3;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 15px;
-      margin-top: 8px;
-      border: 2px solid var(--input-border);
-      border-radius: 10px;
-      font-size: 16px;
-      background: var(--input-bg);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      transition: border-color 0.3s, box-shadow 0.3s;
-      box-sizing: border-box;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 4px 12px rgba(75, 0, 130, 0.2);
-    }
-
-    .error {
-      color: var(--error-color);
-      font-size: 14px;
-      margin-top: 6px;
-      font-weight: 600;
-      text-align: left;
-    }
-
-    .success {
-      color: #28a745;
-      font-size: 16px;
-      margin-top: 10px;
-      font-weight: 600;
-      text-align: center;
-      display: none;
-    }
-
-    .buttons {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    button, a.button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      transition: background-color 0.3s, transform 0.1s;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-      color: var(--white);
-    }
-
-    button:hover, a.button:hover {
-      transform: translateY(-2px);
-    }
-
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .next {
-      background: var(--primary-color);
-    }
-
-    .back {
-      background: var(--secondary-color);
-    }
-
-    .menu-btn, .service-btn, .faq-btn {
-      background: var(--info-color);
-    }
-
-    .data-table {
-      margin-top: 20px;
-      width: 100%;
-      border-collapse: collapse;
-      display: none;
-      background: var(--white);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .data-table.active {
-      display: table;
-    }
-
-    .data-table th, .data-table td {
-      border: 1px solid var(--input-border);
-      padding: 15px;
-      text-align: left;
-      font-size: 14px;
-      vertical-align: middle;
-    }
-
-    .data-table th {
-      background: var(--table-header-bg);
-      color: var(--white);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .data-table tr {
-      transition: background-color 0.3s;
-    }
-
-    .data-table tr:hover {
-      background-color: #F9F5FF;
-    }
-
-    .data-table tr:nth-child(even) {
-      background-color: #F5F1FF;
-    }
-
-    p {
-      margin-bottom: 20px;
-      color: var(--text-color);
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    .clickable-text {
-      color: var(--primary-color);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .clickable-text:hover {
-      text-decoration: underline;
-    }
-
-    .clickable-emoji {
-      cursor: pointer;
-      margin-left: 5px;
-    }
-
-    .clickable-emoji:hover {
-      opacity: 0.7;
-    }
-
-    @media (max-width: 400px) {
-      .container {
-        padding: 20px;
-      }
-
-      h2, h3 {
-        font-size: 1.4em;
-      }
-
-      input {
-        font-size: 14px;
-        padding: 10px 12px;
-      }
-
-      button, a.button {
-        font-size: 14px;
-        padding: 12px;
-      }
-
-      .data-table th, .data-table td {
-        padding: 10px;
-        font-size: 12px;
-      }
-    }
-  </style>
+<style>
+*{box-sizing:border-box;font-family:Segoe UI}
+body{
+margin:0;
+background:linear-gradient(180deg,#0b0f2b,#1a1f4d);
+color:#fff
+}
+.container{max-width:430px;margin:auto;padding:15px}
+.card{
+background:rgba(255,255,255,.08);
+border-radius:16px;
+padding:15px;
+margin-bottom:12px
+}
+h1,h2{text-align:center;margin:10px 0}
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+font-weight:bold;
+background:linear-gradient(45deg,#ffb347,#ffcc33);
+margin-top:8px;
+cursor:pointer
+}
+.menu button{margin-bottom:8px}
+.hidden{display:none}
+.balance{text-align:center;font-size:18px}
+.slot{font-size:42px;text-align:center}
+.badge{
+display:inline-block;
+background:#222;
+padding:4px 10px;
+border-radius:10px;
+margin:2px;
+font-size:12px
+}
+.progress{
+background:#111;border-radius:10px;overflow:hidden;height:8px
+}
+.progress div{height:8px;background:gold}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <div id="wizard">
-      <!-- Главное меню -->
-      <div class="step active" id="step-main">
-        <h2>🏠 Добро пожаловать в ФЕНИKS! 🔥</h2>
-        <p>Возродите свою связь легко и быстро! 🐦</p>
-        <div class="buttons">
-          <button class="menu-btn" data-action="update">📝 Обновить данные</button>
-          <button class="menu-btn" data-action="tariff">🔄 Поменять тариф</button>
-          <button class="menu-btn" data-action="balance">💳 Проверить баланс</button>
-          <button class="menu-btn" data-action="refill">💸 Пополнить баланс</button>
-          <button class="menu-btn" data-action="services">🛠️ Дополнительные услуги</button>
-        </div>
-      </div>
+<div class="container">
 
-      <!-- ФИО -->
-      <div class="step" id="step-fullname">
-        <h3>👤 Укажите ФИО</h3>
-        <p><b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b></p>
-        <div class="input-group">
-          <input type="text" id="fullname" placeholder="Иванов Иван Иванович">
-          <div class="error" id="err-fullname"></div>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-          <button class="next">➡️ Далее</button>
-        </div>
-      </div>
+<!-- AUTH -->
+<div id="auth" class="card">
+<h1>🎰 CASINO</h1>
+<input id="username" placeholder="Введите ник"
+style="width:100%;padding:10px;border-radius:10px;border:none">
+<button onclick="login()">Войти / Регистрация</button>
+</div>
 
-      <!-- Телефон -->
-      <div class="step" id="step-phone">
-        <h3>📞 Номер телефона</h3>
-        <p><b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b></p>
-        <div class="input-group">
-          <input type="tel" id="phone" placeholder="+79991234567">
-          <div class="error" id="err-phone"></div>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-          <button class="next">➡️ Далее</button>
-        </div>
-      </div>
+<!-- PROFILE -->
+<div id="profile" class="hidden">
 
-      <!-- Выбор документа -->
-      <div class="step" id="step-document-type">
-        <h3>📄 Выберите документ</h3>
-        <div class="buttons">
-          <button class="menu-btn" data-doc="Паспорт">📄 Паспорт</button>
-          <button class="menu-btn" data-doc="ИНН">🧾 ИНН</button>
-          <button class="menu-btn" data-doc="СНИЛС">🟢 СНИЛС</button>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+<div class="card">
+<h2>👤 Личный кабинет</h2>
+<div class="balance">Баланс: <b id="balance"></b> 💰</div>
+<div>Уровень: <b id="level"></b> | VIP: <b id="vip"></b></div>
+<div class="progress"><div id="xpbar"></div></div>
+<div id="nfts"></div>
+<button onclick="logout()">Выйти</button>
+</div>
 
-      <!-- Номер документа -->
-      <div class="step" id="step-document-number">
-        <h3 id="doc-title">🔢 Введите номер документа</h3>
-        <p><b>УКАЗЫВАЙТЕ ТОЛЬКО СВОИ ДАННЫЕ</b></p>
-        <div class="input-group">
-          <div id="doc-example" style="margin-bottom:8px;color:#333;font-size:15px;"></div>
-          <input type="text" id="docnumber">
-          <div class="error" id="err-doc"></div>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-          <button class="next">➡️ Далее</button>
-        </div>
-      </div>
+<div class="card menu">
+<button onclick="openGame('slots')">🎰 Слоты</button>
+<button onclick="openGame('roulette')">🎡 Рулетка</button>
+<button onclick="openGame('dice')">🎲 Dice</button>
+<button onclick="openGame('jetx')">🚀 JetX</button>
+<button onclick="topup()">➕ Пополнить</button>
+</div>
+</div>
 
-      <!-- Финал -->
-      <div class="step" id="step-final">
-        <h3>✅ Последний шаг</h3>
-        <p>Для обновления данных подтвердите, что вы - человек!</p>
-        <div class="redirect-button">
-          <a href="https://redirect.figma.site/" target="_blank" class="button next">Я не робот ✅</a>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+<!-- SLOTS -->
+<div id="slots" class="card hidden">
+<h2>🎰 Слоты</h2>
+<div id="slotResult" class="slot">🍒 🍒 🍒</div>
+<button onclick="playSlots()">Крутить (100)</button>
+<button onclick="back()">⬅ Назад</button>
+</div>
 
-      <!-- Дополнительные услуги -->
-      <div class="step" id="step-services">
-        <h3>🛠️ Дополнительные услуги</h3>
-        <div class="buttons">
-          <button class="service-btn" data-service="faq">❓ Часто задаваемые вопросы</button>
-          <button class="service-btn" data-service="instruction">ℹ️ Инструкция</button>
-          <a href="https://t.me/MyPhoenlxsupport" target="_blank">
-            <button class="service-btn">📞 Связаться с техподдержкой</button>
-          </a>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+<!-- ROULETTE -->
+<div id="roulette" class="card hidden">
+<h2>🎡 Рулетка</h2>
+<button onclick="playRoulette()">Ставка (100)</button>
+<button onclick="back()">⬅ Назад</button>
+</div>
 
-      <!-- Часто задаваемые вопросы -->
-      <div class="step" id="step-faq">
-        <h3>❓ Часто задаваемые вопросы</h3>
-        <div class="buttons">
-          <button class="faq-btn" data-faq="penalty">🚫 Блокировка номера телефона из-за неактуализации</button>
-          <button class="faq-btn" data-faq="safe">🔒 Это безопасно?</button>
-          <button class="faq-btn" data-faq="telegram">⚡️ Почему через Telegram?</button>
-          <button class="faq-btn" data-faq="documents">📑 Какие документы можно использовать?</button>
-          <button class="faq-btn" data-faq="fix">🔁 Можно ли исправить ошибку?</button>
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+<!-- DICE -->
+<div id="dice" class="card hidden">
+<h2>🎲 Dice</h2>
+<button onclick="playDice()">Бросить (100)</button>
+<button onclick="back()">⬅ Назад</button>
+</div>
 
-      <!-- Ответы на вопросы -->
-      <div class="step" id="step-faq-answer">
-        <h3 id="faq-title">❓ Ответ</h3>
-        <div id="faq-answer" style="margin-bottom:8px;color:#333;font-size:15px;"></div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+<!-- JETX -->
+<div id="jetx" class="card hidden">
+<h2>🚀 JetX</h2>
+<div id="multiplier" style="font-size:32px;text-align:center">1.00x</div>
+<button onclick="startJetX()">СТАРТ (100)</button>
+<button onclick="cashOut()">ЗАБРАТЬ</button>
+<button onclick="back()">⬅ Назад</button>
+</div>
 
-      <!-- Инструкция -->
-      <div class="step" id="step-instruction">
-        <h3>ℹ️ Инструкция</h3>
-        <div style="margin-bottom:8px;color:#333;font-size:15px;">
-          📋 Чтобы обновить данные:<br>
-          1️⃣ Нажмите «Обновить данные».<br>
-          2️⃣ Введите ФИО, номер телефона.<br>
-          3️⃣ Выберите документ и введите его номер.<br>
-          4️⃣ Подтвердите, что вы не робот.
-        </div>
-        <div class="buttons">
-          <button class="back">↩️ Вернуться назад</button>
-        </div>
-      </div>
+</div>
 
-      <!-- Неавторизованные действия -->
-      <div class="step" id="step-unauthorized">
-        <h3>⚠️ Требуется авторизация</h3>
-        <p>Мы не можем выполнить действие, так как вы не авторизовались.</p>
-        <div class="buttons">
-          <button class="menu-btn" data-action="authorize">🔐 Авторизоваться</button>
-          <button class="menu-btn" data-action="main">↩️ Сменить действие</button>
-        </div>
-      </div>
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-      <!-- Таблица данных (hidden by default) -->
-      <div id="data-output" class="data-table">
-        <h3>📋 Собранные данные</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Время</th>
-              <th>ФИО</th>
-              <th>Телефон</th>
-              <th>Документ</th>
-            </tr>
-          </thead>
-          <tbody id="data-table-body"></tbody>
-        </table>
-      </div>
+let user = JSON.parse(localStorage.getItem("user"));
+let jetxTimer = null;
+let jetxValue = 1;
 
-      <!-- Дата с смайликом для активации данных -->
-      <p style="margin-top: 20px; color: var(--text-color); font-size: 14px;" class="clickable-text">
-        Оператор «Феникс» был основан 22 апреля 2015 года <span id="toggle-emoji" class="clickable-emoji">😊</span>
-      </p>
-    </div>
-  </div>
+if(user) showProfile();
 
-  <script>
-    class PhoenixWizard {
-      constructor() {
-        this.steps = document.querySelectorAll('.step');
-        this.currentStep = 'main';
-        this.formData = {};
-        this.dataStore = [];
-        this.initEventListeners();
-        this.showStep('main');
-      }
+function login(){
+const name=document.getElementById("username").value;
+if(!name) return alert("Введите ник");
+user={
+name,
+balance:1000,
+level:1,
+xp:0,
+vip:0,
+nfts:[]
+};
+save();
+showProfile();
+}
 
-      initEventListeners() {
-        document.getElementById('wizard').addEventListener('click', (e) => {
-          const target = e.target;
-          if (target.classList.contains('next') && !target.closest('a') && !target.closest('.redirect-button')) {
-            this.handleNext();
-          } else if (target.classList.contains('back')) {
-            this.handleBack();
-          } else if (target.classList.contains('menu-btn')) {
-            this.handleMenuAction(target.dataset.action, target.dataset.doc);
-          } else if (target.classList.contains('service-btn')) {
-            this.handleServiceAction(target.dataset.service);
-          } else if (target.classList.contains('faq-btn')) {
-            this.handleFaqAction(target.dataset.faq);
-          } else if (target.id === 'toggle-emoji') {
-            this.checkPassword();
-          }
-        });
+function showProfile(){
+auth.classList.add("hidden");
+profile.classList.remove("hidden");
+render();
+}
 
-        ['fullname', 'phone', 'docnumber'].forEach(id => {
-          const input = document.getElementById(id);
-          input?.addEventListener('input', () => this.validateStep(this.currentStep));
-        });
-      }
+function logout(){
+localStorage.clear();
+location.reload();
+}
 
-      showStep(stepId) {
-        this.steps.forEach(step => {
-          step.classList.toggle('active', step.id === `step-${stepId}`);
-        });
-        this.currentStep = stepId;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+function save(){
+localStorage.setItem("user",JSON.stringify(user));
+}
 
-      handleNext() {
-        if (!this.validateStep(this.currentStep)) return;
-        
-        const nextSteps = {
-          fullname: 'phone',
-          phone: 'document-type',
-          'document-type': 'document-number',
-          'document-number': 'final'
-        };
+function render(){
+balance.innerText=user.balance;
+level.innerText=user.level;
+vip.innerText=user.vip;
+xpbar.style.width=(user.xp)+"%";
+nfts.innerHTML="";
+user.nfts.forEach(n=>nfts.innerHTML+=`<span class="badge">${n}</span>`);
+save();
+}
 
-        if (nextSteps[this.currentStep]) {
-          this.formData[this.currentStep] = document.getElementById(this.currentStep)?.value?.trim();
-          if (this.currentStep === 'document-number') {
-            this.formData['document-number'] = document.getElementById('docnumber').value.trim();
-            this.saveData();
-          }
-          this.showStep(nextSteps[this.currentStep]);
-        }
-      }
+function openGame(id){
+profile.classList.add("hidden");
+document.getElementById(id).classList.remove("hidden");
+}
 
-      handleBack() {
-        const backSteps = {
-          fullname: 'main',
-          phone: 'fullname',
-          'document-type': 'phone',
-          'document-number': 'document-type',
-          final: 'document-number',
-          services: 'main',
-          faq: 'services',
-          'faq-answer': 'faq',
-          instruction: 'services',
-          unauthorized: 'main'
-        };
+function back(){
+document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
+profile.classList.remove("hidden");
+}
 
-        this.showStep(backSteps[this.currentStep] || 'main');
-      }
+function win(amount){
+user.balance+=amount;
+user.xp+=10;
+if(user.xp>=100){
+user.level++;user.xp=0;
+}
+user.vip=Math.floor(user.balance/5000);
+if(user.level>=5&&!user.nfts.includes("Bronze NFT"))user.nfts.push("Bronze NFT");
+if(user.level>=10&&!user.nfts.includes("Gold NFT"))user.nfts.push("Gold NFT");
+render();
+}
 
-      handleMenuAction(action, doc) {
-        if (action === 'update') {
-          this.showStep('fullname');
-        } else if (action === 'tariff' || action === 'balance' || action === 'refill') {
-          this.showStep('unauthorized');
-        } else if (action === 'services') {
-          this.showStep('services');
-        } else if (action === 'authorize') {
-          this.showStep('fullname');
-        } else if (action === 'main') {
-          this.showStep('main');
-        } else if (doc) {
-          this.formData['document-type'] = doc;
-          const docnumber = document.getElementById('docnumber');
-          const example = document.getElementById('doc-example');
-          const examples = {
-            'Паспорт': 'Пример: 4510 123456',
-            'ИНН': 'Пример: 500100732259',
-            'СНИЛС': 'Пример: 112-233-445 95'
-          };
-          example.textContent = examples[doc] || '';
-          this.showStep('document-number');
-        }
-      }
+function lose(amount){
+user.balance-=amount;
+render();
+}
 
-      handleServiceAction(service) {
-        if (service === 'faq') {
-          this.showStep('faq');
-        } else if (service === 'instruction') {
-          this.showStep('instruction');
-        }
-      }
+function playSlots(){
+if(user.balance<100)return alert("Мало средств");
+const s=["🍒","🍋","⭐","7️⃣"];
+const a=s[Math.floor(Math.random()*4)];
+const b=s[Math.floor(Math.random()*4)];
+const c=s[Math.floor(Math.random()*4)];
+slotResult.innerText=`${a} ${b} ${c}`;
+if(a===b&&b===c) win(300); else lose(100);
+}
 
-      handleFaqAction(faq) {
-        const faqContent = {
-          penalty: {
-            title: '🚫 Блокировка номера телефона',
-            answer: '⚠️ Если номер телефона не обновлён вовремя, он может быть заблокирован до подтверждения актуальных данных. 🔥'
-          },
-          safe: {
-            title: '🔒 Это безопасно?',
-            answer: '🔐 Да, у нас стоит защита VISION 3.87676 PRO VS (сквозное шифрование). 🔥'
-          },
-          telegram: {
-            title: '⚡️ Почему через Telegram?',
-            answer: '⚡️ Для удобства и переход на цифровые площадки. 🔥'
-          },
-          documents: {
-            title: '📑 Какие документы можно использовать?',
-            answer: '👉 Паспорт, ИНН, СНИЛС. 🔥'
-          },
-          fix: {
-            title: '🔁 Можно ли исправить ошибку?',
-            answer: '✅ Да, можно. Свяжитесь с техподдержкой или повторите ввод. 🔥'
-          }
-        };
+function playRoulette(){
+if(user.balance<100)return alert("Мало средств");
+Math.random()>0.5?win(200):lose(100);
+}
 
-        document.getElementById('faq-title').textContent = faqContent[faq].title;
-        document.getElementById('faq-answer').textContent = faqContent[faq].answer;
-        this.showStep('faq-answer');
-      }
+function playDice(){
+if(user.balance<100)return alert("Мало средств");
+Math.random()>0.6?win(250):lose(100);
+}
 
-      checkPassword() {
-        const password = prompt('Введите код для доступа к данным:');
-        if (password === '1321') {
-          this.toggleDataTable();
-        } else if (password !== null) {
-          alert('Неверный код! Попробуйте снова.');
-        }
-      }
+function startJetX(){
+if(user.balance<100)return alert("Мало средств");
+lose(100);
+jetxValue=1;
+multiplier.innerText="1.00x";
+jetxTimer=setInterval(()=>{
+jetxValue+=Math.random()*0.15;
+multiplier.innerText=jetxValue.toFixed(2)+"x";
+if(Math.random()>0.97) crash();
+},150);
+}
 
-      toggleDataTable() {
-        const dataOutput = document.getElementById('data-output');
-        if (dataOutput) {
-          dataOutput.classList.toggle('active');
-          if (dataOutput.classList.contains('active')) {
-            this.renderDataTable();
-          }
-        } else {
-          console.error('Data output element not found!');
-        }
-      }
+function cashOut(){
+if(!jetxTimer)return;
+clearInterval(jetxTimer);
+win(Math.floor(jetxValue*100));
+jetxTimer=null;
+}
 
-      sanitizeInput(value) {
-        return value.replace(/[<>"'&]/g, '');
-      }
+function crash(){
+clearInterval(jetxTimer);
+alert("💥 CRASH!");
+jetxTimer=null;
+}
 
-      validateStep(step) {
-        const validations = {
-          fullname: () => {
-            const val = this.sanitizeInput(document.getElementById('fullname').value.trim());
-            const re = /^[А-Яа-яЁё\s-]+$/;
-            const error = document.getElementById('err-fullname');
-            if (!val) {
-              error.textContent = 'Поле ФИО обязательно для заполнения';
-              return false;
-            }
-            if (!re.test(val)) {
-              error.textContent = 'ФИО должно содержать только буквы кириллицы';
-              return false;
-            }
-            error.textContent = '';
-            return true;
-          },
-          phone: () => {
-            const val = this.sanitizeInput(document.getElementById('phone').value.trim());
-            const digits = val.replace(/[^0-9]/g, '');
-            const error = document.getElementById('err-phone');
-            if (!val) {
-              error.textContent = 'Поле телефона обязательно для заполнения';
-              return false;
-            }
-            if (!val.startsWith('+7') && !val.startsWith('7')) {
-              error.textContent = 'Номер должен начинаться с +7 или 7';
-              return false;
-            }
-            if (digits.length < 10 || digits.length > 11) {
-              error.textContent = 'Номер должен содержать 10 или 11 цифр';
-              return false;
-            }
-            error.textContent = '';
-            return true;
-          },
-          'document-number': () => {
-            const val = this.sanitizeInput(document.getElementById('docnumber').value.trim());
-            const error = document.getElementById('err-doc');
-            if (!val) {
-              error.textContent = 'Поле номера документа обязательно';
-              return false;
-            }
-            error.textContent = '';
-            return true;
-          }
-        };
+function topup(){
+user.balance+=500;
+render();
+}
+</script>
 
-        return validations[step]?.() ?? true;
-      }
-
-      saveData() {
-        const timestamp = new Date().toLocaleString('ru-RU');
-        const record = {
-          timestamp,
-          fullname: this.formData.fullname || '',
-          phone: this.formData.phone || '',
-          document: `${this.formData['document-type'] || ''} ${this.formData['document-number'] || ''}`.trim()
-        };
-        this.dataStore.push(record);
-      }
-
-      renderDataTable() {
-        const tbody = document.getElementById('data-table-body');
-        if (tbody) {
-          tbody.innerHTML = '';
-          this.dataStore.forEach(record => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${record.timestamp}</td>
-              <td>${record.fullname}</td>
-              <td>${record.phone}</td>
-              <td>${record.document}</td>
-            `;
-            tbody.appendChild(tr);
-          });
-        } else {
-          console.error('Data table body element not found!');
-        }
-      }
-    }
-
-    const wizard = new PhoenixWizard();
-  </script>
 </body>
 </html>
