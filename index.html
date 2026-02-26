@@ -1,243 +1,148 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crypto Neon Casino — Играй и Выигрывай</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мини-приложение сделки</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f001a, #1a0033);
-      color: #e0d0ff;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image: url('https://thumbs.dreamstime.com/b/empty-casino-filled-slot-machines-bright-neon-lights-glow-futuristic-tech-await-players-las-vegas-style-ambiance-ideal-345402484.jpg');
-      background-size: cover;
-      background-attachment: fixed;
-    }
-    header {
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(10px);
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
       padding: 20px;
-      text-align: center;
-      border-bottom: 2px solid #ff00ff;
-      box-shadow: 0 0 30px #ff00ff;
     }
-    h1 {
-      font-size: 3.5rem;
-      text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
-      background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .balance-panel {
-      background: rgba(20,0,40,0.8);
-      border: 2px solid #00ffff;
-      border-radius: 15px;
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       padding: 20px;
-      margin: 20px 0;
-      text-align: center;
-      box-shadow: 0 0 30px #00ffff;
+      width: 400px;
     }
-    .balance { font-size: 2.5rem; color: #ffd700; text-shadow: 0 0 15px #ffd700; }
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      margin: 40px 0;
+    h2 {
+      margin-top: 0;
     }
-    .game-card {
-      background: linear-gradient(145deg, #2a004a, #0f001a);
-      border: 2px solid #ff00ff;
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      transition: all 0.4s;
-      box-shadow: 0 0 20px rgba(255,0,255,0.4);
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
     }
-    .game-card:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 40px #ff00ff;
-    }
-    .game-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
-    button {
-      background: linear-gradient(90deg, #ff00ff, #00ffff);
-      border: none;
-      color: #000;
-      font-size: 1.2rem;
-      padding: 12px 30px;
-      border-radius: 50px;
-      cursor: pointer;
-      margin: 10px;
-      transition: all 0.3s;
-      box-shadow: 0 0 20px #ff00ff;
-    }
-    button:hover { transform: scale(1.1); box-shadow: 0 0 40px #00ffff; }
-    .auth-section {
-      background: rgba(0,0,0,0.6);
-      padding: 30px;
-      border-radius: 20px;
-      max-width: 500px;
-      margin: 30px auto;
-      border: 2px solid #00ffff;
-      box-shadow: 0 0 30px #00ffff;
-    }
-    input {
+    input, textarea, select {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: 1px solid #ff00ff;
-      background: rgba(255,255,255,0.1);
-      color: white;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
-    .hidden { display: none; }
-    footer { text-align: center; padding: 20px; color: #aaa; }
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .hidden {
+      display: none;
+    }
+    .deal-card {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
   </style>
 </head>
 <body>
+  <div class="card">
+    <h2>Создать сделку</h2>
+    <div id="step1">
+      <label for="buyer">Telegram покупателя:</label>
+      <input type="text" id="buyer" placeholder="@buyer">
 
-  <header>
-    <h1>Crypto Neon Casino</h1>
-    <p>Неон, крипта, большие выигрыши!</p>
-  </header>
+      <label for="seller">Telegram продавца:</label>
+      <input type="text" id="seller" placeholder="@seller">
 
-  <div class="container">
+      <label for="amount">Сумма сделки ($):</label>
+      <input type="number" id="amount" min="2" value="2">
 
-    <!-- Авторизация / Регистрация -->
-    <div id="auth" class="auth-section">
-      <h2>Вход / Регистрация</h2>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Пароль" required>
-      <button onclick="register()">Регистрация</button>
-      <button onclick="login()">Войти</button>
-      <p id="auth-msg" style="color:#ff4444;"></p>
+      <button onclick="nextStep()">Далее</button>
     </div>
 
-    <!-- Панель после входа -->
-    <div id="dashboard" class="hidden">
-      <div class="balance-panel">
-        <h3>Баланс</h3>
-        <div class="balance" id="balance">0 монет</div>
-        <button onclick="showBuy()">Купить монеты (Crypto.com Pay)</button>
-      </div>
+    <div id="step2" class="hidden">
+      <label for="material">Описание материала / ссылка / файл:</label>
+      <textarea id="material" rows="3" placeholder="Например, PSD логотипа"></textarea>
 
-      <!-- Покупка монет -->
-      <div id="buy-section" class="hidden" style="text-align:center; margin:30px 0;">
-        <h2>Пополнить баланс</h2>
-        <p>Выбери сумму и оплати криптой</p>
-        <!-- Crypto.com Pay Button -->
-        <div id="pay-button"></div>
-        <script src="https://js.crypto.com/sdk?publishable-key=YOUR_PUBLISHABLE_KEY"></script>
-        <script>
-          // Пример: 100 USD → ~10000 монет (можно менять)
-          cryptopay.Button({
-            createPayment: function(actions) {
-              actions.payment.create({
-                currency: 'USD',
-                amount: 100,          // 100 USD
-                description: 'Пополнение 10000 монет в Crypto Neon Casino',
-                order_id: 'topup-' + Date.now(),
-                metadata: { user: localStorage.getItem('userEmail') || 'guest' }
-              });
-            },
-            onApprove: function(data, actions) {
-              alert('Оплата прошла! Монеты скоро будут зачислены. (В реальности — webhook/API)');
-              // Здесь в реальном проекте — backend webhook добавит монеты
-              addCoins(10000); // демо
-            },
-            defaultLang: 'ru-RU'
-          }).render("#pay-button");
-        </script>
-        <button onclick="hideBuy()">Закрыть</button>
-      </div>
+      <label for="conditions">Дополнительные условия:</label>
+      <textarea id="conditions" rows="3" placeholder="Сроки, формат, проверки"></textarea>
 
-      <h2>Игры</h2>
-      <div class="games-grid">
-        <div class="game-card">
-          <img src="https://thumbs.dreamstime.com/b/vibrant-slot-machine-set-glowing-neon-city-backdrop-accompanied-gold-coins-playing-cards-creating-dynamic-engaging-373669432.jpg" alt="Слоты">
-          <h3>Неоновые Слоты</h3>
-          <button onclick="playGame('Слоты')">Играть</button>
-        </div>
-        <div class="game-card">
-          <img src="https://thumbs.dreamstime.com/b/neon-illustration-depicting-casino-interior-scene-features-elements-like-roulette-table-slot-machines-poker-chips-417107296.jpg" alt="Рулетка">
-          <h3>Крипто-Рулетка</h3>
-          <button onclick="playGame('Рулетка')">Играть</button>
-        </div>
-        <div class="game-card">
-          <img src="https://thumbs.dreamstime.com/b/luxury-casino-interior-stacks-chips-bitcoin-coin-table-many-people-inside-night-scene-colorful-lights-vip-area-355805415.jpg" alt="Покер">
-          <h3>Техасский Холдем</h3>
-          <button onclick="playGame('Покер')">Играть</button>
-        </div>
-        <div class="game-card">
-          <img src="https://aibc.world/app/uploads/2024/05/btc-crypto-casinos-1.webp" alt="Blackjack">
-          <h3>Блэкджек</h3>
-          <button onclick="playGame('Блэкджек')">Играть</button>
-        </div>
+      <button onclick="createDeal()">Создать сделку</button>
+    </div>
+
+    <div id="dealPreview" class="hidden">
+      <h3>Предварительный просмотр сделки</h3>
+      <div class="deal-card">
+        <p><strong>Покупатель:</strong> <span id="previewBuyer"></span></p>
+        <p><strong>Продавец:</strong> <span id="previewSeller"></span></p>
+        <p><strong>Сумма:</strong> $<span id="previewAmount"></span></p>
+        <p><strong>Материал:</strong> <span id="previewMaterial"></span></p>
+        <p><strong>Условия:</strong> <span id="previewConditions"></span></p>
       </div>
-      <button onclick="logout()">Выйти</button>
+      <button onclick="sendDeal()">Отправить сделку</button>
+    </div>
+
+    <div id="dealSent" class="hidden">
+      <h3>Сделка отправлена!</h3>
+      <p>Второму пользователю пришло уведомление.</p>
     </div>
   </div>
 
-  <footer>
-    © 2026 Crypto Neon Casino | Только 18+ | Играй ответственно
-  </footer>
-
   <script>
-    function register() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      if (!email || !pass) return alert('Заполни поля!');
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('userPass', pass); // НЕбезопасно! Только демо
-      localStorage.setItem('coins', 1000);
-      alert('Регистрация прошла! Теперь войди.');
-    }
+    function nextStep() {
+      const buyer = document.getElementById('buyer').value.trim();
+      const seller = document.getElementById('seller').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
 
-    function login() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      if (localStorage.getItem('userEmail') === email && localStorage.getItem('userPass') === pass) {
-        document.getElementById('auth').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        updateBalance();
-      } else {
-        document.getElementById('auth-msg').textContent = 'Неверный email или пароль!';
+      if (!buyer || !seller || isNaN(amount) || amount < 2) {
+        alert('Заполните все поля корректно (сумма ≥ $2)');
+        return;
       }
+
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
     }
 
-    function logout() {
-      document.getElementById('dashboard').classList.add('hidden');
-      document.getElementById('auth').classList.remove('hidden');
+    function createDeal() {
+      const material = document.getElementById('material').value.trim();
+      const conditions = document.getElementById('conditions').value.trim();
+
+      if (!material || !conditions) {
+        alert('Заполните описание материала и условия сделки');
+        return;
+      }
+
+      // Заполняем превью
+      document.getElementById('previewBuyer').innerText = document.getElementById('buyer').value;
+      document.getElementById('previewSeller').innerText = document.getElementById('seller').value;
+      document.getElementById('previewAmount').innerText = document.getElementById('amount').value;
+      document.getElementById('previewMaterial').innerText = material;
+      document.getElementById('previewConditions').innerText = conditions;
+
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('dealPreview').classList.remove('hidden');
     }
 
-    function updateBalance() {
-      const coins = localStorage.getItem('coins') || 0;
-      document.getElementById('balance').textContent = coins + ' монет';
-    }
-
-    function addCoins(amount) {
-      let coins = parseInt(localStorage.getItem('coins') || 0);
-      coins += amount;
-      localStorage.setItem('coins', coins);
-      updateBalance();
-    }
-
-    function playGame(name) {
-      alert(`Запускается ${name}... (демо — в реальности добавь логику игры)`);
-      // Здесь можно отнимать/добавлять монеты по результату
-    }
-
-    function showBuy() { document.getElementById('buy-section').classList.remove('hidden'); }
-    function hideBuy() { document.getElementById('buy-section').classList.add('hidden'); }
-
-    // Автологин если уже залогинен
-    if (localStorage.getItem('userEmail')) {
-      document.getElementById('auth').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-      updateBalance();
+    function sendDeal() {
+      // Здесь будет логика отправки данных боту через API
+      document.getElementById('dealPreview').classList.add('hidden');
+      document.getElementById('dealSent').classList.remove('hidden');
     }
   </script>
 </body>
